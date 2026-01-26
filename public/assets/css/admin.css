@@ -1,0 +1,47 @@
+body.admin {
+    margin: 0;
+    font-family: 'Segoe UI', sans-serif;
+    background: #0b0b12;
+    color: #f5f5f5;
+}
+.sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 240px;
+    background: #151521;
+    padding: 2rem 1.5rem;
+}
+.sidebar nav a {
+    display: block;
+    color: #9da5b4;
+    text-decoration: none;
+    margin: 0.5rem 0;
+}
+.sidebar nav a:hover { color: #fff; }
+.admin-main { margin-left: 260px; padding: 2rem; }
+.admin-header { display: flex; justify-content: space-between; align-items: center; }
+.admin-form { display: grid; gap: 1rem; max-width: 600px; }
+.admin-form input, .admin-form textarea, .admin-form select {
+    width: 100%;
+    padding: 0.6rem;
+    border-radius: 8px;
+    border: 1px solid #2a2a3d;
+    background: #1b1b2a;
+    color: #fff;
+}
+.admin-table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+.admin-table th, .admin-table td { padding: 0.8rem; border-bottom: 1px solid #2a2a3d; text-align: left; }
+.metric { background: #1b1b2a; padding: 1rem; border-radius: 12px; display: inline-block; margin-right: 1rem; }
+.chart { display: flex; gap: 0.5rem; align-items: flex-end; }
+.chart-bar { background: #e50914; width: 40px; height: calc(var(--value) * 2px); border-radius: 6px; }
+.installer { max-width: 600px; margin: 2rem auto; background: #1b1b2a; padding: 2rem; border-radius: 16px; }
+.installer label { display: block; margin-bottom: 1rem; }
+.installer input { width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #2a2a3d; background: #151521; color: #fff; }
+.btn { display: inline-block; padding: 0.7rem 1.2rem; border-radius: 999px; background: #e50914; color: #fff; border: none; cursor: pointer; }
+.requirements .ok { color: #4ade80; }
+.requirements .fail { color: #f87171; }
+@media (max-width: 900px) {
+    .sidebar { position: static; width: auto; }
+    .admin-main { margin-left: 0; }
+}

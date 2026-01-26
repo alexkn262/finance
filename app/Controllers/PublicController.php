@@ -1,0 +1,223 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Controllers;
+
+use App\Core\Analytics;
+use App\Core\Config;
+use App\Core\Database;
+use App\Core\Installer;
+use App\Core\RateLimiter;
+use App\Core\Security;
+use PDO;
+
+final class PublicController
+{
+    private function ensureInstalled(): void
+    {
+        if (!Installer::isInstalled()) {
+            redirect('/install');
+        }
+    }
+
+    public function home(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/');
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare("SELECT id, title, slug, seo_description FROM articles WHERE status = 'published' ORDER BY published_at DESC LIMIT :limit");
+        $stmt->bindValue(':limit', 6, PDO::PARAM_INT);
+        $stmt->execute();
+        $articles = $stmt->fetchAll();
+        $categoryStmt = $pdo->prepare('SELECT id, name, slug FROM categories ORDER BY name ASC');
+        $categoryStmt->execute();
+        $categories = $categoryStmt->fetchAll();
+        view('home', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'siteName' => Config::get('APP_NAME', 'Finance'),
+        ]);
+    }
+
+    public function startHere(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/start-here');
+        view('start-here');
+    }
+
+    public function blog(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/blog');
+        $pdo = Database::connection();
+        $category = $_GET['category'] ?? null;
+        $page = max(1, (int) ($_GET['page'] ?? 1));
+        $limit = 6;
+        $offset = ($page - 1) * $limit;
+        if ($category) {
+            $stmt = $pdo->prepare("SELECT a.id, a.title, a.slug, a.seo_description FROM articles a JOIN categories c ON a.category_id = c.id WHERE a.status = 'published' AND c.slug = :slug ORDER BY a.published_at DESC LIMIT :limit OFFSET :offset");
+            $stmt->bindValue(':slug', $category, PDO::PARAM_STR);
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $articles = $stmt->fetchAll();
+        } else {
+            $stmt = $pdo->prepare("SELECT id, title, slug, seo_description FROM articles WHERE status = 'published' ORDER BY published_at DESC LIMIT :limit OFFSET :offset");
+            $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
+            $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
+            $stmt->execute();
+            $articles = $stmt->fetchAll();
+        }
+        $categoryStmt = $pdo->prepare('SELECT name, slug FROM categories ORDER BY name ASC');
+        $categoryStmt->execute();
+        $categories = $categoryStmt->fetchAll();
+        view('blog', [
+            'articles' => $articles,
+            'categories' => $categories,
+            'currentCategory' => $category,
+            'page' => $page,
+        ]);
+    }
+
+    public function article(array $matches): void
+    {
+        $this->ensureInstalled();
+        $slug = $matches[1] ?? '';
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_title, a.seo_description FROM articles a WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
+        $stmt->execute([':slug' => $slug]);
+        $article = $stmt->fetch(PDO::FETCH_ASSOC);
+        if (!$article) {
+            http_response_code(404);
+            view('errors/404');
+            return;
+        }
+        Analytics::track('/blog/' . $slug);
+        $commentStmt = $pdo->prepare("SELECT author_name, content, created_at FROM comments WHERE article_id = :id AND status = 'approved' ORDER BY created_at DESC");
+        $commentStmt->execute([':id' => $article['id']]);
+        $comments = $commentStmt->fetchAll();
+        view('article', [
+            'article' => $article,
+            'comments' => $comments,
+            'csrf' => Security::csrfToken(),
+            'seoTitle' => $article['seo_title'] ?: $article['title'],
+            'seoDescription' => $article['seo_description'] ?? '',
+        ]);
+    }
+
+    public function tools(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/tools');
+        view('tools/index');
+    }
+
+    public function compoundInterest(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/tools/compound-interest');
+        view('tools/compound-interest');
+    }
+
+    public function loanCalculator(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/tools/loan-calculator');
+        view('tools/loan-calculator');
+    }
+
+    public function fireCalculator(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/tools/fire-calculator');
+        view('tools/fire-calculator');
+    }
+
+    public function inflationCalculator(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/tools/inflation-calculator');
+        view('tools/inflation-calculator');
+    }
+
+    public function search(): void
+    {
+        $this->ensureInstalled();
+        $term = trim((string) ($_GET['q'] ?? ''));
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare("SELECT title, slug FROM articles WHERE status = 'published' AND title LIKE :term LIMIT 10");
+        $stmt->execute([':term' => '%' . $term . '%']);
+        $results = $stmt->fetchAll();
+        header('Content-Type: application/json');
+        echo json_encode(['results' => $results]);
+    }
+
+    public function sitemap(): void
+    {
+        $this->ensureInstalled();
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare("SELECT slug FROM articles WHERE status = 'published' ORDER BY published_at DESC");
+        $stmt->execute();
+        $articles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        view('sitemap', ['articles' => $articles]);
+    }
+
+    public function robots(): void
+    {
+        $this->ensureInstalled();
+        header('Content-Type: text/plain');
+        view('robots');
+    }
+
+    public function submitComment(): void
+    {
+        $this->ensureInstalled();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $limit = (int) Config::get('RATE_LIMIT_MAX', 5);
+        $window = (int) Config::get('RATE_LIMIT_WINDOW', 60);
+        if (!RateLimiter::check('comment:' . $ip, $limit, $window)) {
+            http_response_code(429);
+            exit('Too many requests');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('INSERT INTO comments (article_id, author_name, author_email, content, status, ip_hash, created_at) VALUES (:article_id, :author_name, :author_email, :content, :status, :ip_hash, :created_at)');
+        $stmt->execute([
+            ':article_id' => (int) $_POST['article_id'],
+            ':author_name' => $_POST['author_name'],
+            ':author_email' => $_POST['author_email'],
+            ':content' => Security::sanitizeHtml($_POST['content']),
+            ':status' => 'pending',
+            ':ip_hash' => Analytics::hashIp($ip),
+            ':created_at' => time(),
+        ]);
+        redirect('/blog');
+    }
+
+    public function subscribeNewsletter(): void
+    {
+        $this->ensureInstalled();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
+        if (!$email) {
+            http_response_code(422);
+            exit('Invalid email');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO newsletter_subscribers (email, status, created_at) VALUES (:email, :status, :created_at)');
+        $stmt->execute([
+            ':email' => $email,
+            ':status' => 'pending',
+            ':created_at' => time(),
+        ]);
+        redirect('/');
+    }
+}

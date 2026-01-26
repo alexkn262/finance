@@ -1,0 +1,22 @@
+<?php ob_start(); ?>
+<section class="hero compact">
+    <div class="container">
+        <h1>Compound interest calculator</h1>
+        <p>Estimate long-term growth of your investments.</p>
+    </div>
+</section>
+<section class="tool">
+    <div class="container">
+        <form class="tool-form" data-tool="compound">
+            <label>Initial investment <input type="number" name="principal" value="1000"></label>
+            <label>Monthly contribution <input type="number" name="monthly" value="200"></label>
+            <label>Annual return (%) <input type="number" step="0.1" name="rate" value="7"></label>
+            <label>Years <input type="number" name="years" value="20"></label>
+            <button class="btn" type="button" data-calc>Calculate</button>
+        </form>
+        <div class="tool-result" data-result></div>
+        <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
+    </div>
+</section>
+<?php $content = ob_get_clean(); ?>
+<?php view('layout', compact('content')); ?>
