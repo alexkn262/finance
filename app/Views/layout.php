@@ -2,6 +2,7 @@
 $siteName = config('APP_NAME', 'Finance');
 $seoTitle = $seoTitle ?? $siteName . ' | Finance Education';
 $seoDescription = $seoDescription ?? 'Modern finance education, tools, and guides.';
+$nonce = App\Core\Security::cspNonce();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -11,8 +12,8 @@ $seoDescription = $seoDescription ?? 'Modern finance education, tools, and guide
     <title><?= e($seoTitle) ?></title>
     <meta name="description" content="<?= e($seoDescription) ?>">
     <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
-    <script defer src="<?= asset_url('assets/js/app.js') ?>"></script>
-    <script type="application/ld+json"><?= json_encode([
+    <script defer src="<?= asset_url('assets/js/app.js') ?>" nonce="<?= e($nonce) ?>"></script>
+    <script type="application/ld+json" nonce="<?= e($nonce) ?>"><?= json_encode([
         '@context' => 'https://schema.org',
         '@type' => 'WebSite',
         'name' => $siteName,
