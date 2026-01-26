@@ -14,6 +14,9 @@
             <button class="btn" type="button" data-calc>Calculate</button>
         </form>
         <div class="tool-result" data-result></div>
+        <div class="article-content">
+            <p>Formula: Payment = P * r / (1 - (1 + r)^-n)</p>
+        </div>
         <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
     </div>
 </section>

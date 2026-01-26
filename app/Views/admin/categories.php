@@ -13,7 +13,7 @@
 </form>
 <table class="admin-table">
     <thead>
-        <tr><th>Name</th><th>Slug</th><th>Parent</th></tr>
+        <tr><th>Name</th><th>Slug</th><th>Parent</th><th>Action</th></tr>
     </thead>
     <tbody>
         <?php foreach ($categories as $category): ?>
@@ -21,6 +21,7 @@
                 <td><?= e($category['name']) ?></td>
                 <td><?= e($category['slug']) ?></td>
                 <td><?= e((string) $category['parent_id']) ?></td>
+                <td><a href="<?= base_url('/admin/categories/edit?id=' . (int) $category['id']) ?>">Edit</a></td>
             </tr>
         <?php endforeach; ?>
     </tbody>

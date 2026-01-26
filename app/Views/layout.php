@@ -41,6 +41,32 @@ $nonce = App\Core\Security::cspNonce();
     </main>
     <footer class="site-footer">
         <div class="container">
+            <div class="footer-grid">
+                <div>
+                    <h3><?= e($siteName) ?></h3>
+                    <p>Modern finance education, tools, and authority resources built for long-term growth.</p>
+                </div>
+                <div>
+                    <h4>Explore</h4>
+                    <a href="<?= base_url('/blog') ?>">Guides</a>
+                    <a href="<?= base_url('/tools') ?>">Tools</a>
+                    <a href="<?= base_url('/start-here') ?>">Start Here</a>
+                </div>
+                <div>
+                    <h4>Company</h4>
+                    <a href="<?= base_url('/privacy') ?>">Privacy</a>
+                    <a href="<?= base_url('/terms') ?>">Terms</a>
+                    <a href="<?= base_url('/contact') ?>">Contact</a>
+                </div>
+                <div>
+                    <h4>Newsletter</h4>
+                    <form method="post" action="<?= base_url('/newsletter') ?>" class="footer-form">
+                        <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
+                        <input type="email" name="email" placeholder="you@example.com" required>
+                        <button class="btn" type="submit">Subscribe</button>
+                    </form>
+                </div>
+            </div>
             <p>© <?= date('Y') ?> <?= e($siteName) ?>. Built for long-term financial authority.</p>
         </div>
     </footer>

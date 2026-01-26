@@ -18,6 +18,8 @@
             <a href="<?= base_url('/admin/tags') ?>">Tags</a>
             <a href="<?= base_url('/admin/comments') ?>">Comments</a>
             <a href="<?= base_url('/admin/analytics') ?>">Analytics</a>
+            <a href="<?= base_url('/admin/newsletter') ?>">Newsletter</a>
+            <a href="<?= base_url('/admin/ads') ?>">Ads</a>
             <a href="<?= base_url('/admin/settings') ?>">Settings</a>
         </nav>
         <form method="post" action="<?= base_url('/admin/logout') ?>">

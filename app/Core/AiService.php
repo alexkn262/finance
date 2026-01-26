@@ -9,12 +9,13 @@ final class AiService
     public function generateArticle(string $keyword): array
     {
         $title = sprintf('Mastering %s: A Modern Finance Guide', ucfirst($keyword));
-        $content = '<p>This long-form guide explains ' . $keyword . ' with actionable steps, case studies, and frameworks for smarter money decisions.</p>';
-        $content .= '<p>Explore fundamentals, advanced strategies, and practical checklists to implement today.</p>';
+        $content = '<p>This long-form guide explores ' . $keyword . ' with expert insights, actionable frameworks, and data-backed strategies.</p>';
+        $content .= '<p>It synthesizes insights inspired by top-ranking finance resources to ensure complete topical coverage.</p>';
         return [
             'title' => $title,
             'meta_description' => 'Learn the key strategies for ' . $keyword . ' with a premium step-by-step finance guide.',
             'content' => $content,
+            'featured_image' => 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=1200&q=80',
         ];
     }
 

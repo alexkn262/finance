@@ -56,8 +56,18 @@ final class App
         $this->router->post('/newsletter', [new PublicController(), 'subscribeNewsletter']);
         $this->router->get('/sitemap.xml', [new PublicController(), 'sitemap']);
         $this->router->get('/robots.txt', [new PublicController(), 'robots']);
+        $this->router->get('/contact', [new PublicController(), 'contact']);
+        $this->router->post('/contact', [new PublicController(), 'submitContact']);
+        $this->router->get('/privacy', [new PublicController(), 'privacy']);
+        $this->router->get('/terms', [new PublicController(), 'terms']);
+        $this->router->get('/unsubscribe', [new PublicController(), 'unsubscribe']);
         $this->router->get('/admin/analytics', [new AdminController(), 'analytics']);
         $this->router->get('/admin/analytics/page', [new AdminController(), 'pageAnalytics']);
+        $this->router->get('/admin/newsletter', [new AdminController(), 'newsletter']);
+        $this->router->post('/admin/newsletter/send', [new AdminController(), 'sendNewsletter']);
+        $this->router->post('/admin/newsletter/delete', [new AdminController(), 'deleteSubscriber']);
+        $this->router->get('/admin/ads', [new AdminController(), 'ads']);
+        $this->router->post('/admin/ads', [new AdminController(), 'saveAds']);
 
         $this->router->get('/admin', [new AdminController(), 'dashboard']);
         $this->router->get('/admin/login', [new AuthController(), 'showLogin']);
@@ -66,13 +76,19 @@ final class App
         $this->router->get('/admin/articles', [new ContentController(), 'articles']);
         $this->router->get('/admin/articles/create', [new ContentController(), 'createArticle']);
         $this->router->post('/admin/articles/create', [new ContentController(), 'storeArticle']);
+        $this->router->get('/admin/articles/edit', [new ContentController(), 'editArticle']);
+        $this->router->post('/admin/articles/edit', [new ContentController(), 'updateArticle']);
         $this->router->get('/admin/articles/ai', [new ContentController(), 'aiArticle']);
         $this->router->post('/admin/articles/ai', [new ContentController(), 'generateAi']);
         $this->router->post('/admin/articles/rewrite', [new ContentController(), 'rewriteAi']);
         $this->router->get('/admin/categories', [new ContentController(), 'categories']);
         $this->router->post('/admin/categories', [new ContentController(), 'storeCategory']);
+        $this->router->get('/admin/categories/edit', [new ContentController(), 'editCategory']);
+        $this->router->post('/admin/categories/edit', [new ContentController(), 'updateCategory']);
         $this->router->get('/admin/tags', [new ContentController(), 'tags']);
         $this->router->post('/admin/tags', [new ContentController(), 'storeTag']);
+        $this->router->get('/admin/tags/edit', [new ContentController(), 'editTag']);
+        $this->router->post('/admin/tags/edit', [new ContentController(), 'updateTag']);
         $this->router->get('/admin/comments', [new ContentController(), 'comments']);
         $this->router->post('/admin/comments/update', [new ContentController(), 'updateComment']);
         $this->router->get('/admin/settings', [new AdminController(), 'settings']);

@@ -7,6 +7,7 @@
     <input type="hidden" name="csrf_token" value="<?= e($csrf) ?>">
     <label>Title <input type="text" name="title" value=""></label>
     <label>Slug <input type="text" name="slug" value=""></label>
+    <label>Featured image URL <input type="text" name="featured_image" value="<?= e($featured_image ?? '') ?>"></label>
     <label>Content (HTML)
         <textarea name="content_html" rows="6"></textarea>
     </label>

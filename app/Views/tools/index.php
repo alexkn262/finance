@@ -13,6 +13,9 @@
             <a class="card" href="<?= base_url('/tools/fire-calculator') ?>">FIRE Calculator</a>
             <a class="card" href="<?= base_url('/tools/inflation-calculator') ?>">Real Inflation Calculator</a>
         </div>
+        <div class="article-content">
+            <p>Each calculator includes transparent formulas, interactive inputs, and educational notes to help you plan smarter.</p>
+        </div>
     </div>
 </section>
 <?php $content = ob_get_clean(); ?>

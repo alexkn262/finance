@@ -12,13 +12,14 @@
 </form>
 <table class="admin-table">
     <thead>
-        <tr><th>Name</th><th>Slug</th></tr>
+        <tr><th>Name</th><th>Slug</th><th>Action</th></tr>
     </thead>
     <tbody>
         <?php foreach ($tags as $tag): ?>
             <tr>
                 <td><?= e($tag['name']) ?></td>
                 <td><?= e($tag['slug']) ?></td>
+                <td><a href="<?= base_url('/admin/tags/edit?id=' . (int) $tag['id']) ?>">Edit</a></td>
             </tr>
         <?php endforeach; ?>
     </tbody>

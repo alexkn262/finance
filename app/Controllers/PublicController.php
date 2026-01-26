@@ -39,9 +39,16 @@ final class PublicController
             $categoryStmt->execute();
             return $categoryStmt->fetchAll();
         });
+        $tools = [
+            ['title' => 'Compound Interest Calculator', 'url' => '/tools/compound-interest'],
+            ['title' => 'Loan Payment Calculator', 'url' => '/tools/loan-calculator'],
+            ['title' => 'FIRE Calculator', 'url' => '/tools/fire-calculator'],
+            ['title' => 'Real Inflation Calculator', 'url' => '/tools/inflation-calculator'],
+        ];
         view('home', [
             'articles' => $articles,
             'categories' => $categories,
+            'tools' => $tools,
             'siteName' => Config::get('APP_NAME', 'Finance'),
         ]);
     }
@@ -178,6 +185,63 @@ final class PublicController
         view('robots');
     }
 
+    public function contact(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/contact');
+        view('contact', ['csrf' => Security::csrfToken()]);
+    }
+
+    public function submitContact(): void
+    {
+        $this->ensureInstalled();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('INSERT INTO contact_messages (name, email, subject, message, created_at) VALUES (:name, :email, :subject, :message, :created_at)');
+        $stmt->execute([
+            ':name' => $_POST['name'],
+            ':email' => $_POST['email'],
+            ':subject' => $_POST['subject'] ?? null,
+            ':message' => $_POST['message'],
+            ':created_at' => time(),
+        ]);
+        redirect('/contact');
+    }
+
+    public function privacy(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/privacy');
+        view('privacy');
+    }
+
+    public function terms(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/terms');
+        view('terms');
+    }
+
+    public function unsubscribe(): void
+    {
+        $this->ensureInstalled();
+        $token = $_GET['token'] ?? '';
+        if ($token === '') {
+            redirect('/');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('UPDATE newsletter_subscribers SET status = :status, updated_at = :updated_at WHERE unsubscribe_token = :token');
+        $stmt->execute([
+            ':status' => 'unsubscribed',
+            ':updated_at' => time(),
+            ':token' => $token,
+        ]);
+        redirect('/');
+    }
+
     public function submitComment(): void
     {
         $this->ensureInstalled();
@@ -219,11 +283,14 @@ final class PublicController
             exit('Invalid email');
         }
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('INSERT OR IGNORE INTO newsletter_subscribers (email, status, created_at) VALUES (:email, :status, :created_at)');
+        $token = bin2hex(random_bytes(16));
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO newsletter_subscribers (email, status, unsubscribe_token, created_at, updated_at) VALUES (:email, :status, :token, :created_at, :updated_at)');
         $stmt->execute([
             ':email' => $email,
             ':status' => 'pending',
+            ':token' => $token,
             ':created_at' => time(),
+            ':updated_at' => time(),
         ]);
         redirect('/');
     }

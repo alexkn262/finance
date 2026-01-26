@@ -14,6 +14,9 @@
             <button class="btn" type="button" data-calc>Calculate</button>
         </form>
         <div class="tool-result" data-result></div>
+        <div class="article-content">
+            <p>Formula: Future price = Current price × (1 + inflation rate)^years</p>
+        </div>
         <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
     </div>
 </section>

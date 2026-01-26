@@ -31,6 +31,49 @@ final class ContentController
         view('admin/articles', ['articles' => $articles]);
     }
 
+    public function editArticle(): void
+    {
+        $this->requireAuth();
+        $pdo = Database::connection();
+        $id = (int) ($_GET['id'] ?? 0);
+        $stmt = $pdo->prepare('SELECT * FROM articles WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $article = $stmt->fetch(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare('SELECT id, name FROM categories ORDER BY name ASC');
+        $stmt->execute();
+        $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = $pdo->prepare('SELECT id, name FROM tags ORDER BY name ASC');
+        $stmt->execute();
+        $tags = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        view('admin/article-edit', ['article' => $article, 'categories' => $categories, 'tags' => $tags, 'csrf' => Security::csrfToken()]);
+    }
+
+    public function updateArticle(): void
+    {
+        $this->requireAuth();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('UPDATE articles SET title = :title, slug = :slug, category_id = :category_id, content_html = :content_html, featured_image = :featured_image, status = :status, seo_title = :seo_title, seo_description = :seo_description, updated_at = :updated_at, published_at = :published_at WHERE id = :id');
+        $status = $_POST['status'] ?? 'draft';
+        $stmt->execute([
+            ':title' => $_POST['title'],
+            ':slug' => $_POST['slug'],
+            ':category_id' => $_POST['category_id'] ?: null,
+            ':content_html' => Security::sanitizeHtml($_POST['content_html'] ?? ''),
+            ':featured_image' => $_POST['featured_image'] ?? null,
+            ':status' => $status,
+            ':seo_title' => $_POST['seo_title'] ?? null,
+            ':seo_description' => $_POST['seo_description'] ?? null,
+            ':updated_at' => time(),
+            ':published_at' => $status === 'published' ? time() : null,
+            ':id' => (int) $_POST['id'],
+        ]);
+        redirect('/admin/articles');
+    }
+
     public function createArticle(): void
     {
         $this->requireAuth();
@@ -110,7 +153,7 @@ final class ContentController
         $content = (string) ($_POST['content'] ?? '');
         $ai = new AiService();
         $rewrites = $ai->rewriteArticle($content);
-        view('admin/ai-rewrite', ['rewrites' => $rewrites, 'csrf' => Security::csrfToken(), 'original' => $content]);
+        view('admin/ai-rewrite', ['rewrites' => $rewrites, 'csrf' => Security::csrfToken(), 'original' => $content, 'featured_image' => $_POST['featured_image'] ?? '']);
     }
 
     public function categories(): void
@@ -121,6 +164,37 @@ final class ContentController
         $stmt->execute();
         $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         view('admin/categories', ['categories' => $categories, 'csrf' => Security::csrfToken()]);
+    }
+
+    public function editCategory(): void
+    {
+        $this->requireAuth();
+        $pdo = Database::connection();
+        $id = (int) ($_GET['id'] ?? 0);
+        $stmt = $pdo->prepare('SELECT * FROM categories WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $category = $stmt->fetch(PDO::FETCH_ASSOC);
+        view('admin/category-edit', ['category' => $category, 'csrf' => Security::csrfToken()]);
+    }
+
+    public function updateCategory(): void
+    {
+        $this->requireAuth();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('UPDATE categories SET name = :name, slug = :slug, parent_id = :parent_id, seo_title = :seo_title, seo_description = :seo_description WHERE id = :id');
+        $stmt->execute([
+            ':name' => $_POST['name'],
+            ':slug' => $_POST['slug'],
+            ':parent_id' => $_POST['parent_id'] ?: null,
+            ':seo_title' => $_POST['seo_title'] ?? null,
+            ':seo_description' => $_POST['seo_description'] ?? null,
+            ':id' => (int) $_POST['id'],
+        ]);
+        redirect('/admin/categories');
     }
 
     public function storeCategory(): void
@@ -151,6 +225,36 @@ final class ContentController
         $stmt->execute();
         $tags = $stmt->fetchAll(PDO::FETCH_ASSOC);
         view('admin/tags', ['tags' => $tags, 'csrf' => Security::csrfToken()]);
+    }
+
+    public function editTag(): void
+    {
+        $this->requireAuth();
+        $pdo = Database::connection();
+        $id = (int) ($_GET['id'] ?? 0);
+        $stmt = $pdo->prepare('SELECT * FROM tags WHERE id = :id');
+        $stmt->execute([':id' => $id]);
+        $tag = $stmt->fetch(PDO::FETCH_ASSOC);
+        view('admin/tag-edit', ['tag' => $tag, 'csrf' => Security::csrfToken()]);
+    }
+
+    public function updateTag(): void
+    {
+        $this->requireAuth();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('UPDATE tags SET name = :name, slug = :slug, seo_title = :seo_title, seo_description = :seo_description WHERE id = :id');
+        $stmt->execute([
+            ':name' => $_POST['name'],
+            ':slug' => $_POST['slug'],
+            ':seo_title' => $_POST['seo_title'] ?? null,
+            ':seo_description' => $_POST['seo_description'] ?? null,
+            ':id' => (int) $_POST['id'],
+        ]);
+        redirect('/admin/tags');
     }
 
     public function storeTag(): void

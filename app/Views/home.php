@@ -27,6 +27,19 @@
         </div>
     </div>
 </section>
+<section class="featured">
+    <div class="container">
+        <h2>Popular tools</h2>
+        <div class="grid">
+            <?php foreach ($tools as $tool): ?>
+                <a class="card" href="<?= base_url($tool['url']) ?>">
+                    <h3><?= e($tool['title']) ?></h3>
+                    <p>Interactive calculator built to maximize learning time.</p>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
 <section class="categories">
     <div class="container">
         <h2>Explore categories</h2>
