@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 use App\Core\Analytics;
+use App\Core\Cache;
 use App\Core\Config;
 use App\Core\Database;
 use App\Core\Installer;
@@ -26,13 +27,18 @@ final class PublicController
         $this->ensureInstalled();
         Analytics::track('/');
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT id, title, slug, seo_description FROM articles WHERE status = 'published' ORDER BY published_at DESC LIMIT :limit");
-        $stmt->bindValue(':limit', 6, PDO::PARAM_INT);
-        $stmt->execute();
-        $articles = $stmt->fetchAll();
-        $categoryStmt = $pdo->prepare('SELECT id, name, slug FROM categories ORDER BY name ASC');
-        $categoryStmt->execute();
-        $categories = $categoryStmt->fetchAll();
+        $ttl = (int) Config::get('CACHE_TTL', 300);
+        $articles = Cache::remember('home_articles', $ttl, function () use ($pdo) {
+            $stmt = $pdo->prepare("SELECT id, title, slug, seo_description FROM articles WHERE status = 'published' ORDER BY published_at DESC LIMIT :limit");
+            $stmt->bindValue(':limit', 6, PDO::PARAM_INT);
+            $stmt->execute();
+            return $stmt->fetchAll();
+        });
+        $categories = Cache::remember('home_categories', $ttl, function () use ($pdo) {
+            $categoryStmt = $pdo->prepare('SELECT id, name, slug FROM categories ORDER BY name ASC');
+            $categoryStmt->execute();
+            return $categoryStmt->fetchAll();
+        });
         view('home', [
             'articles' => $articles,
             'categories' => $categories,
