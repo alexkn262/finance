@@ -28,6 +28,11 @@ final class Router
     {
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
         $path = rtrim($path, '/') ?: '/';
+        $extension = pathinfo($path, PATHINFO_EXTENSION);
+        if ($extension !== '') {
+            http_response_code(404);
+            return;
+        }
         $handler = $this->routes[$method][$path] ?? null;
         if ($handler) {
             call_user_func($handler);
