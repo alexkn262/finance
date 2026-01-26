@@ -17,10 +17,21 @@ if (searchInput && searchResults) {
             searchResults.innerHTML = '';
             return;
         }
-        const response = await fetch(`/search?q=${encodeURIComponent(term)}`);
-        const data = await response.json();
-        searchResults.innerHTML = data.results.map((item) => `<a href="/blog/${encodeURIComponent(item.slug)}">${item.title}</a>`).join('');
-        searchResults.classList.add('active');
+        try {
+            const response = await fetch(`/search?q=${encodeURIComponent(term)}`);
+            const data = await response.json();
+            searchResults.innerHTML = '';
+            data.results.forEach((item) => {
+                const link = document.createElement('a');
+                link.href = `/blog/${encodeURIComponent(item.slug)}`;
+                link.textContent = item.title;
+                searchResults.appendChild(link);
+            });
+            searchResults.classList.add('active');
+        } catch (error) {
+            searchResults.classList.remove('active');
+            searchResults.innerHTML = '';
+        }
     }, 300));
 }
 
@@ -39,7 +50,7 @@ document.querySelectorAll('[data-calc]').forEach((button) => {
             const months = years * 12;
             let total = principal;
             for (let i = 0; i < months; i++) {
-                total = (total + monthly) * (1 + rate);
+                total = total * (1 + rate) + monthly;
             }
             output = `Projected balance: $${total.toFixed(2)}`;
         }

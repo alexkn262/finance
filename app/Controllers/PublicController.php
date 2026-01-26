@@ -152,6 +152,7 @@ final class PublicController
     {
         $this->ensureInstalled();
         $term = trim((string) ($_GET['q'] ?? ''));
+        $term = addcslashes($term, "%_");
         $pdo = Database::connection();
         $stmt = $pdo->prepare("SELECT title, slug FROM articles WHERE status = 'published' AND title LIKE :term LIMIT 10");
         $stmt->execute([':term' => '%' . $term . '%']);

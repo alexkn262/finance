@@ -9,7 +9,7 @@ final class AiService
     public function generateArticle(string $keyword): array
     {
         $title = sprintf('Mastering %s: A Modern Finance Guide', ucfirst($keyword));
-        $content = '<p>This long-form guide explains ' . e($keyword) . ' with actionable steps, case studies, and frameworks for smarter money decisions.</p>';
+        $content = '<p>This long-form guide explains ' . $keyword . ' with actionable steps, case studies, and frameworks for smarter money decisions.</p>';
         $content .= '<p>Explore fundamentals, advanced strategies, and practical checklists to implement today.</p>';
         return [
             'title' => $title,

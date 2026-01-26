@@ -6,15 +6,26 @@ namespace App\Core;
 
 final class Security
 {
+    private static ?string $nonce = null;
+
     public static function initHeaders(): void
     {
+        $nonce = self::cspNonce();
         header('X-Frame-Options: DENY');
         header('X-Content-Type-Options: nosniff');
         header('Referrer-Policy: strict-origin-when-cross-origin');
         header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Cross-Origin-Resource-Policy: same-site');
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+    }
+
+    public static function cspNonce(): string
+    {
+        if (!self::$nonce) {
+            self::$nonce = bin2hex(random_bytes(16));
+        }
+        return self::$nonce;
     }
 
     public static function startSession(): void
@@ -58,10 +69,11 @@ final class Security
 
     public static function sanitizeHtml(string $html): string
     {
-        $allowed = '<p><br><strong><em><ul><ol><li><a><blockquote><code><pre><h2><h3><h4><img><span><div>';
+        $allowed = '<p><br><strong><em><ul><ol><li><a><blockquote><code><pre><h2><h3><h4><span><div>';
         $clean = strip_tags($html, $allowed);
         $clean = preg_replace('/on\w+\s*=\s*"[^"]*"/i', '', $clean);
         $clean = preg_replace("/javascript:/i", '', $clean);
+        $clean = preg_replace('/<img[^>]+>/i', '', $clean);
         return $clean ?? '';
     }
 

@@ -51,7 +51,7 @@ final class Installer
                 $stmt = $pdo->prepare('INSERT INTO migrations (name, applied_at) VALUES (:name, :applied_at)');
                 $stmt->execute([':name' => $name, ':applied_at' => time()]);
                 $pdo->commit();
-            } catch (RuntimeException $e) {
+            } catch (\Throwable $e) {
                 $pdo->rollBack();
                 throw $e;
             }
@@ -60,8 +60,13 @@ final class Installer
 
     private static function migrationFiles(): array
     {
+        $path = BASE_PATH . '/app/migrations/001_core_tables.sql';
+        $contents = file_get_contents($path);
+        if ($contents === false) {
+            throw new RuntimeException('Migration file missing: ' . $path);
+        }
         return [
-            '001_core_tables' => file_get_contents(BASE_PATH . '/app/migrations/001_core_tables.sql'),
+            '001_core_tables' => $contents,
         ];
     }
 

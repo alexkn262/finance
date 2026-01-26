@@ -6,6 +6,7 @@ namespace App\Controllers\Admin;
 
 use App\Core\Config;
 use App\Core\Database;
+use App\Core\Installer;
 use App\Core\RateLimiter;
 use App\Core\Security;
 use PDO;
@@ -30,7 +31,7 @@ final class AuthController
             exit('Invalid CSRF token');
         }
         $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
-        $limit = (int) Config::get('RATE_LIMIT_MAX', 5);
+        $limit = (int) Config::get('RATE_LIMIT_MAX', 100);
         $window = (int) Config::get('RATE_LIMIT_WINDOW', 60);
         if (!RateLimiter::check('admin-login:' . $ip, $limit, $window)) {
             http_response_code(429);

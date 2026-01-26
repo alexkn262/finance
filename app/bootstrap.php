@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use App\Core\App;
 use App\Core\Config;
 
 define('BASE_PATH', dirname(__DIR__));
@@ -29,7 +28,4 @@ $debug = (bool) Config::get('APP_DEBUG', false);
 ini_set('display_errors', $debug ? '1' : '0');
 error_reporting($debug ? E_ALL : (E_ALL & ~E_NOTICE & ~E_DEPRECATED));
 
-App::boot();
-
-$app = new App();
-$app->run();
+App\Core\App::boot();

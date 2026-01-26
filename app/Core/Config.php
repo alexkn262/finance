@@ -17,9 +17,10 @@ final class Config
         if (is_file($envPath)) {
             $values = array_merge($values, self::parseEnvFile($envPath));
         }
-        if (isset($_SERVER['HTTP_HOST'])) {
+        if (!empty($_SERVER['SERVER_NAME'])) {
             $scheme = (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') ? 'https' : 'http';
-            $values['APP_URL'] = $scheme . '://' . $_SERVER['HTTP_HOST'];
+            $host = preg_replace('/[^a-zA-Z0-9.:-]/', '', $_SERVER['SERVER_NAME']);
+            $values['APP_URL'] = $scheme . '://' . $host;
         }
         self::$values = array_merge($values, self::$values);
     }
