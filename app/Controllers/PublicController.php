@@ -35,7 +35,7 @@ final class PublicController
             return $stmt->fetchAll();
         });
         $categories = Cache::remember('home_categories', $ttl, function () use ($pdo) {
-            $categoryStmt = $pdo->prepare('SELECT id, name, slug FROM categories ORDER BY name ASC');
+            $categoryStmt = $pdo->prepare('SELECT id, name, slug, featured_image FROM categories ORDER BY name ASC');
             $categoryStmt->execute();
             return $categoryStmt->fetchAll();
         });
@@ -94,9 +94,9 @@ final class PublicController
             $total = (int) $countStmt->fetchColumn();
         }
         $totalPages = (int) ceil($total / $limit);
-        $categoryStmt = $pdo->prepare('SELECT name, slug FROM categories ORDER BY name ASC');
-        $categoryStmt->execute();
-        $categories = $categoryStmt->fetchAll();
+            $categoryStmt = $pdo->prepare('SELECT name, slug, featured_image FROM categories ORDER BY name ASC');
+            $categoryStmt->execute();
+            $categories = $categoryStmt->fetchAll();
         view('blog', [
             'articles' => $articles,
             'categories' => $categories,
@@ -106,6 +106,17 @@ final class PublicController
             'categoryInfo' => $categoryInfo,
             'totalArticles' => $total,
         ]);
+    }
+
+    public function categories(): void
+    {
+        $this->ensureInstalled();
+        Analytics::track('/categories');
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare("SELECT c.id, c.name, c.slug, c.seo_description, c.featured_image, c.created_at, (SELECT COUNT(*) FROM articles a WHERE a.category_id = c.id AND a.status = 'published') as article_count FROM categories c ORDER BY c.name ASC");
+        $stmt->execute();
+        $categories = $stmt->fetchAll();
+        view('categories', ['categories' => $categories]);
     }
 
     public function article(array $matches): void

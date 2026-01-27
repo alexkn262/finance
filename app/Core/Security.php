@@ -17,7 +17,7 @@ final class Security
         header('Permissions-Policy: geolocation=(), microphone=(), camera=()');
         header('Cross-Origin-Opener-Policy: same-origin');
         header('Cross-Origin-Resource-Policy: same-site');
-        header("Content-Security-Policy: default-src 'self'; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
+        header("Content-Security-Policy: default-src 'self'; img-src 'self' https: http: data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'nonce-{$nonce}'; connect-src 'self'; frame-ancestors 'none'; base-uri 'self'; form-action 'self'");
     }
 
     public static function cspNonce(): string

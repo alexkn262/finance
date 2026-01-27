@@ -75,10 +75,16 @@ final class Installer
         if ($contents3 === false) {
             throw new RuntimeException('Migration file missing: ' . $path3);
         }
+        $path4 = BASE_PATH . '/app/migrations/004_category_featured_image.sql';
+        $contents4 = file_get_contents($path4);
+        if ($contents4 === false) {
+            throw new RuntimeException('Migration file missing: ' . $path4);
+        }
         return [
             '001_core_tables' => $contents,
             '002_newsletter_contact' => $contents2,
             '003_article_likes' => $contents3,
+            '004_category_featured_image' => $contents4,
         ];
     }
 
@@ -107,11 +113,12 @@ final class Installer
     {
         $pdo = Database::connection();
         $now = time();
-        $categoryStmt = $pdo->prepare('INSERT INTO categories (name, slug, parent_id, seo_title, seo_description, created_at) VALUES (:name, :slug, :parent_id, :seo_title, :seo_description, :created_at)');
+        $categoryStmt = $pdo->prepare('INSERT INTO categories (name, slug, parent_id, featured_image, seo_title, seo_description, created_at) VALUES (:name, :slug, :parent_id, :featured_image, :seo_title, :seo_description, :created_at)');
         $categoryStmt->execute([
             ':name' => 'Smart Investing',
             ':slug' => 'smart-investing',
             ':parent_id' => null,
+            ':featured_image' => 'https://images.unsplash.com/photo-1483985988355-763728e1935b?auto=format&fit=crop&w=1200&q=80',
             ':seo_title' => 'Smart Investing Guides',
             ':seo_description' => 'Evidence-based investment strategies, portfolio structure, and long-term planning.',
             ':created_at' => $now,
@@ -121,6 +128,7 @@ final class Installer
             ':name' => 'Money Fundamentals',
             ':slug' => 'money-fundamentals',
             ':parent_id' => null,
+            ':featured_image' => 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=1200&q=80',
             ':seo_title' => 'Money Fundamentals',
             ':seo_description' => 'Core money skills for budgeting, saving, and building a strong foundation.',
             ':created_at' => $now,

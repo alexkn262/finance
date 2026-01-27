@@ -168,7 +168,7 @@ final class ContentController
     {
         $this->requireAuth();
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('SELECT id, name, slug, parent_id FROM categories ORDER BY name ASC');
+        $stmt = $pdo->prepare('SELECT id, name, slug, parent_id, featured_image FROM categories ORDER BY name ASC');
         $stmt->execute();
         $categories = $stmt->fetchAll(PDO::FETCH_ASSOC);
         view('admin/categories', ['categories' => $categories, 'csrf' => Security::csrfToken()]);
@@ -193,11 +193,12 @@ final class ContentController
             exit('Invalid CSRF token');
         }
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('UPDATE categories SET name = :name, slug = :slug, parent_id = :parent_id, seo_title = :seo_title, seo_description = :seo_description WHERE id = :id');
+        $stmt = $pdo->prepare('UPDATE categories SET name = :name, slug = :slug, parent_id = :parent_id, featured_image = :featured_image, seo_title = :seo_title, seo_description = :seo_description WHERE id = :id');
         $stmt->execute([
             ':name' => $_POST['name'],
             ':slug' => $_POST['slug'],
             ':parent_id' => $_POST['parent_id'] ?: null,
+            ':featured_image' => $_POST['featured_image'] ?? null,
             ':seo_title' => $_POST['seo_title'] ?? null,
             ':seo_description' => $_POST['seo_description'] ?? null,
             ':id' => (int) $_POST['id'],
@@ -213,11 +214,12 @@ final class ContentController
             exit('Invalid CSRF token');
         }
         $pdo = Database::connection();
-        $stmt = $pdo->prepare('INSERT INTO categories (name, slug, parent_id, seo_title, seo_description, created_at) VALUES (:name, :slug, :parent_id, :seo_title, :seo_description, :created_at)');
+        $stmt = $pdo->prepare('INSERT INTO categories (name, slug, parent_id, featured_image, seo_title, seo_description, created_at) VALUES (:name, :slug, :parent_id, :featured_image, :seo_title, :seo_description, :created_at)');
         $stmt->execute([
             ':name' => $_POST['name'],
             ':slug' => $_POST['slug'],
             ':parent_id' => $_POST['parent_id'] ?: null,
+            ':featured_image' => $_POST['featured_image'] ?? null,
             ':seo_title' => $_POST['seo_title'] ?? null,
             ':seo_description' => $_POST['seo_description'] ?? null,
             ':created_at' => time(),

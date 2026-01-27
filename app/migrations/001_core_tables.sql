@@ -16,6 +16,7 @@ CREATE TABLE IF NOT EXISTS categories (
     name TEXT NOT NULL,
     slug TEXT NOT NULL UNIQUE,
     parent_id INTEGER,
+    featured_image TEXT,
     seo_title TEXT,
     seo_description TEXT,
     created_at INTEGER NOT NULL,

@@ -50,6 +50,7 @@
         <div class="grid">
             <?php foreach ($categories as $category): ?>
                 <div class="card">
+                    <div class="card-media" style="background-image: url('<?= e($category['featured_image'] ?? 'https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&w=800&q=80') ?>')"></div>
                     <h3><?= e($category['name']) ?></h3>
                     <a href="<?= base_url('/blog?category=' . $category['slug']) ?>">View</a>
                 </div>

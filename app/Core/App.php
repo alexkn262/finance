@@ -46,6 +46,7 @@ final class App
         $this->router->get('/', [new PublicController(), 'home']);
         $this->router->get('/start-here', [new PublicController(), 'startHere']);
         $this->router->get('/blog', [new PublicController(), 'blog']);
+        $this->router->get('/categories', [new PublicController(), 'categories']);
         $this->router->getPattern('#^/blog/([^/]+)$#', [new PublicController(), 'article']);
         $this->router->getPattern('#^/blog/([^/]+)/amp$#', [new PublicController(), 'articleAmp']);
         $this->router->get('/tools', [new PublicController(), 'tools']);

@@ -8,9 +8,14 @@
 <?php if (!empty($categoryInfo)): ?>
     <section class="article-content">
         <div class="container">
-            <h2><?= e($categoryInfo['name']) ?></h2>
-            <p><?= e($categoryInfo['seo_description'] ?? 'Category insights and curated guides.') ?></p>
-            <p>Total guides: <?= (int) $totalArticles ?></p>
+            <div class="grid">
+                <div class="card">
+                    <h2><?= e($categoryInfo['name']) ?></h2>
+                    <p><?= e($categoryInfo['seo_description'] ?? 'Category insights and curated guides.') ?></p>
+                    <p>Total guides: <?= (int) $totalArticles ?></p>
+                    <a class="btn" href="<?= base_url('/categories') ?>">Browse all categories</a>
+                </div>
+            </div>
         </div>
     </section>
 <?php endif; ?>

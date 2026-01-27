@@ -8,6 +8,7 @@
     <label>Name <input type="text" name="name" value="<?= e($category['name'] ?? '') ?>" required></label>
     <label>Slug <input type="text" name="slug" value="<?= e($category['slug'] ?? '') ?>" required></label>
     <label>Parent ID <input type="number" name="parent_id" value="<?= e((string) ($category['parent_id'] ?? '')) ?>"></label>
+    <label>Featured image URL <input type="text" name="featured_image" value="<?= e($category['featured_image'] ?? '') ?>"></label>
     <label>SEO title <input type="text" name="seo_title" value="<?= e($category['seo_title'] ?? '') ?>"></label>
     <label>SEO description <input type="text" name="seo_description" value="<?= e($category['seo_description'] ?? '') ?>"></label>
     <button class="btn" type="submit">Update category</button>
