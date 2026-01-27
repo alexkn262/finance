@@ -69,11 +69,25 @@ final class Security
 
     public static function sanitizeHtml(string $html): string
     {
-        $allowed = '<p><br><strong><em><ul><ol><li><a><blockquote><code><pre><h2><h3><h4><span><div>';
+        $allowed = '<p><br><strong><em><ul><ol><li><a><blockquote><code><pre><h2><h3><h4><span><div><img>';
         $clean = strip_tags($html, $allowed);
         $clean = preg_replace('/on\w+\s*=\s*"[^"]*"/i', '', $clean);
         $clean = preg_replace("/javascript:/i", '', $clean);
-        $clean = preg_replace('/<img[^>]+>/i', '', $clean);
+        $clean = preg_replace_callback('/<img[^>]*>/i', function (array $matches): string {
+            $tag = $matches[0];
+            if (!preg_match('/src\s*=\s*("|\')([^"\']+)\1/i', $tag, $srcMatch)) {
+                return '';
+            }
+            $src = $srcMatch[2];
+            if (!preg_match('#^(https?:)?//#i', $src)) {
+                return '';
+            }
+            $alt = '';
+            if (preg_match('/alt\s*=\s*("|\')([^"\']*)\1/i', $tag, $altMatch)) {
+                $alt = htmlspecialchars($altMatch[2], ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8');
+            }
+            return '<img src="' . htmlspecialchars($src, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8') . '" alt="' . $alt . '" loading="lazy">';
+        }, $clean);
         $clean = $clean ?? '';
         if (trim($clean) === '') {
             return '';

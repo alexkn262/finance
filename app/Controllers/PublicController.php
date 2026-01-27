@@ -124,7 +124,7 @@ final class PublicController
         $this->ensureInstalled();
         $slug = trim($matches[1] ?? '', '/');
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_title, a.seo_description, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count, (SELECT COUNT(*) FROM article_likes WHERE article_id = a.id) as like_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT a.id, a.title, a.slug, a.content_html, a.seo_title, a.seo_description, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count, (SELECT COUNT(*) FROM article_likes WHERE article_id = a.id) as like_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
         $stmt->execute([':slug' => $slug]);
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
@@ -132,6 +132,7 @@ final class PublicController
             view('errors/404');
             return;
         }
+        $article['slug'] = $article['slug'] ?? $slug;
         $article['content_html'] = Security::sanitizeHtml($article['content_html'] ?? '');
         Analytics::track('/blog/' . $slug);
         $commentStmt = $pdo->prepare("SELECT author_name, content, created_at FROM comments WHERE article_id = :id AND status = 'approved' ORDER BY created_at DESC");
