@@ -121,6 +121,7 @@ final class PublicController
             view('errors/404');
             return;
         }
+        $article['content_html'] = Security::sanitizeHtml($article['content_html'] ?? '');
         Analytics::track('/blog/' . $slug);
         $commentStmt = $pdo->prepare("SELECT author_name, content, created_at FROM comments WHERE article_id = :id AND status = 'approved' ORDER BY created_at DESC");
         $commentStmt->execute([':id' => $article['id']]);
@@ -156,6 +157,7 @@ final class PublicController
             view('errors/404');
             return;
         }
+        $article['content_html'] = Security::sanitizeHtml($article['content_html'] ?? '');
         $article['slug'] = $slug;
         view('article-amp', ['article' => $article]);
     }

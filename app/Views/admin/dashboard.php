@@ -47,6 +47,7 @@
             bars.appendChild(li);
         });
     };
+    const dashboardData = <?= json_encode($trends, JSON_UNESCAPED_SLASHES) ?>;
     renderBars(dashboardData);
     setInterval(() => {
         fetch('/admin/analytics/data')
