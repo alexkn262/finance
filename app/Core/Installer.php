@@ -45,6 +45,11 @@ final class Installer
             if ($stmt->fetchColumn() > 0) {
                 continue;
             }
+            if ($name === '004_category_featured_image' && self::columnExists($pdo, 'categories', 'featured_image')) {
+                $stmt = $pdo->prepare('INSERT INTO migrations (name, applied_at) VALUES (:name, :applied_at)');
+                $stmt->execute([':name' => $name, ':applied_at' => time()]);
+                continue;
+            }
             $pdo->beginTransaction();
             try {
                 $pdo->exec($sql);
@@ -86,6 +91,18 @@ final class Installer
             '003_article_likes' => $contents3,
             '004_category_featured_image' => $contents4,
         ];
+    }
+
+    private static function columnExists(PDO $pdo, string $table, string $column): bool
+    {
+        $stmt = $pdo->prepare("PRAGMA table_info({$table})");
+        $stmt->execute();
+        foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
+            if (($row['name'] ?? null) === $column) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static function setupAdmin(string $name, string $email, string $password): void
