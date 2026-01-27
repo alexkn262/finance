@@ -56,6 +56,7 @@ final class App
         $this->router->get('/search', [new PublicController(), 'search']);
         $this->router->post('/comment', [new PublicController(), 'submitComment']);
         $this->router->post('/newsletter', [new PublicController(), 'subscribeNewsletter']);
+        $this->router->post('/like', [new PublicController(), 'likeArticle']);
         $this->router->get('/sitemap.xml', [new PublicController(), 'sitemap']);
         $this->router->get('/robots.txt', [new PublicController(), 'robots']);
         $this->router->get('/contact', [new PublicController(), 'contact']);

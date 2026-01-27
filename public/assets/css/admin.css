@@ -52,8 +52,24 @@ body.admin {
     transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .metric:hover { transform: translateY(-4px); box-shadow: 0 20px 45px rgba(0,0,0,0.35); }
-.chart { display: flex; gap: 0.6rem; align-items: flex-end; }
-.chart-bar { background: var(--accent); width: 42px; height: calc(var(--value) * 2px); border-radius: 8px; transition: height 0.3s ease; }
+.chart { position: relative; background: #0f0f18; border-radius: 16px; padding: 1.5rem; }
+.bar-chart { min-height: 240px; display: flex; align-items: flex-end; }
+.bar-chart-list { list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(60px, 1fr)); gap: 1rem; margin: 0; padding: 0; width: 100%; align-items: end; }
+.bar-chart-list li { display: grid; justify-items: center; gap: 0.4rem; color: var(--muted); font-size: 0.85rem; }
+.bar-chart-list .bar-top { width: 54px; height: 20px; border-radius: 999px; background: rgba(229,9,20,0.25); }
+.bar-chart-list .bar-bottom {
+    width: 54px;
+    border-radius: 999px;
+    background: linear-gradient(180deg, rgba(229,9,20,0.85), rgba(229,9,20,0.35));
+    display: grid;
+    align-items: end;
+    justify-items: center;
+    padding-bottom: 0.4rem;
+    box-shadow: 0 10px 30px rgba(229,9,20,0.35);
+}
+.bar-chart-list li:hover .bar-top { background: rgba(229,9,20,0.6); }
+.bar-chart-list li:hover .bar-bottom { background: linear-gradient(180deg, rgba(229,9,20,1), rgba(229,9,20,0.45)); }
+.bar-chart-list .bar-bottom strong { color: #fff; font-size: 0.9rem; }
 .installer { max-width: 600px; margin: 2rem auto; background: #1b1b2a; padding: 2rem; border-radius: 16px; }
 .installer label { display: block; margin-bottom: 1rem; }
 .installer input { width: 100%; padding: 0.6rem; border-radius: 8px; border: 1px solid #2a2a3d; background: #151521; color: #fff; }

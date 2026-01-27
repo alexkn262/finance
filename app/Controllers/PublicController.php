@@ -113,7 +113,7 @@ final class PublicController
         $this->ensureInstalled();
         $slug = trim($matches[1] ?? '', '/');
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_title, a.seo_description, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_title, a.seo_description, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count, (SELECT COUNT(*) FROM article_likes WHERE article_id = a.id) as like_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
         $stmt->execute([':slug' => $slug]);
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
@@ -156,6 +156,7 @@ final class PublicController
             view('errors/404');
             return;
         }
+        $article['slug'] = $slug;
         view('article-amp', ['article' => $article]);
     }
 
@@ -332,5 +333,24 @@ final class PublicController
             ':updated_at' => time(),
         ]);
         redirect('/');
+    }
+
+    public function likeArticle(): void
+    {
+        $this->ensureInstalled();
+        if (!Security::validateCsrf($_POST['csrf_token'] ?? null)) {
+            http_response_code(403);
+            exit('Invalid CSRF token');
+        }
+        $articleId = (int) ($_POST['article_id'] ?? 0);
+        $ip = $_SERVER['REMOTE_ADDR'] ?? '0.0.0.0';
+        $pdo = Database::connection();
+        $stmt = $pdo->prepare('INSERT OR IGNORE INTO article_likes (article_id, ip_hash, created_at) VALUES (:article_id, :ip_hash, :created_at)');
+        $stmt->execute([
+            ':article_id' => $articleId,
+            ':ip_hash' => Analytics::hashIp($ip),
+            ':created_at' => time(),
+        ]);
+        redirect('/blog/' . ($_POST['slug'] ?? ''));
     }
 }

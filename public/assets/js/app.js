@@ -95,12 +95,12 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
             resultButton.style.display = current === steps.length - 1 ? 'inline-flex' : 'none';
         }
     };
-    const animateStep = () => {
-        steps.forEach((step) => step.classList.remove('fade'));
+    const animateStep = (direction = 'next') => {
+        steps.forEach((step) => step.classList.remove('slide-next', 'slide-prev'));
         const active = steps[current];
         if (active) {
             active.classList.add('active');
-            active.classList.add('fade');
+            active.classList.add(direction === 'next' ? 'slide-next' : 'slide-prev');
         }
     };
     nextButtons.forEach((button) => {
@@ -108,7 +108,7 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
             if (current < steps.length - 1) {
                 current += 1;
                 update();
-                animateStep();
+                animateStep('next');
                 syncButtons();
             }
         });
@@ -118,7 +118,7 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
             if (current > 0) {
                 current -= 1;
                 update();
-                animateStep();
+                animateStep('prev');
                 syncButtons();
             }
         });
@@ -132,6 +132,6 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
         });
     }
     update();
-    animateStep();
+    animateStep('next');
     syncButtons();
 });

@@ -17,14 +17,48 @@
 </section>
 <section class="admin-chart">
     <h2>Traffic trends</h2>
-    <div class="chart">
-        <?php foreach ($trends as $trend): ?>
-            <div class="chart-bar" style="--value: <?= (int) $trend['views'] ?>">
-                <span><?= e($trend['day']) ?></span>
-            </div>
-        <?php endforeach; ?>
+    <div class="chart bar-chart" id="dashboard-chart">
+        <ul class="bar-chart-list" id="dashboard-bars"></ul>
     </div>
 </section>
+<script nonce="<?= e(App\Core\Security::cspNonce()) ?>">
+    const renderBars = (data) => {
+        const values = data.map((t) => t.views);
+        const max = Math.max(...values, 1);
+        const bars = document.getElementById('dashboard-bars');
+        if (!bars) return;
+        bars.innerHTML = '';
+        data.forEach((trend) => {
+            const li = document.createElement('li');
+            const top = document.createElement('div');
+            top.className = 'bar-top';
+            const bottom = document.createElement('div');
+            bottom.className = 'bar-bottom';
+            bottom.style.height = `${Math.max((trend.views / max) * 160, 12)}px`;
+            const label = document.createElement('span');
+            const date = new Date(trend.day);
+            label.textContent = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit' });
+            const value = document.createElement('strong');
+            value.textContent = trend.views;
+            bottom.appendChild(value);
+            li.appendChild(top);
+            li.appendChild(bottom);
+            li.appendChild(label);
+            bars.appendChild(li);
+        });
+    };
+    renderBars(dashboardData);
+    setInterval(() => {
+        fetch('/admin/analytics/data')
+            .then((res) => res.json())
+            .then((data) => {
+                if (data.trends) {
+                    renderBars(data.trends);
+                }
+            })
+            .catch(() => {});
+    }, 30000);
+</script>
 <section class="admin-table-wrap">
     <h2>Recent articles</h2>
     <table class="admin-table">

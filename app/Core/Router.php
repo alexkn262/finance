@@ -27,6 +27,7 @@ final class Router
     public function dispatch(string $method, string $uri): void
     {
         $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        $path = preg_replace('#/+#', '/', $path);
         $path = rtrim($path, '/') ?: '/';
         $extension = pathinfo($path, PATHINFO_EXTENSION);
         if ($extension !== '') {

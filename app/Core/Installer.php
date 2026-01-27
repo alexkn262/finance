@@ -70,9 +70,15 @@ final class Installer
         if ($contents2 === false) {
             throw new RuntimeException('Migration file missing: ' . $path2);
         }
+        $path3 = BASE_PATH . '/app/migrations/003_article_likes.sql';
+        $contents3 = file_get_contents($path3);
+        if ($contents3 === false) {
+            throw new RuntimeException('Migration file missing: ' . $path3);
+        }
         return [
             '001_core_tables' => $contents,
             '002_newsletter_contact' => $contents2,
+            '003_article_likes' => $contents3,
         ];
     }
 
