@@ -35,5 +35,27 @@
         </div>
     </div>
 </section>
+<?php if (!empty($categories)): ?>
+    <section class="categories">
+        <div class="container">
+            <div class="section-title">
+                <h2>Explore categories</h2>
+                <p>Jump into each topic area with curated guides and learning tracks.</p>
+            </div>
+            <div class="grid grid-2">
+                <?php foreach ($categories as $category): ?>
+                    <article class="card">
+                        <div class="card-media" style="background-image: url('<?= e($category['featured_image'] ?? 'https://images.unsplash.com/photo-1489515217757-5fd1be406fef?auto=format&fit=crop&w=800&q=80') ?>')"></div>
+                        <div class="card-body">
+                            <h3><?= e($category['name']) ?></h3>
+                            <p><?= e($category['seo_description'] ?? 'Category insights and curated guides.') ?></p>
+                            <a href="<?= base_url('/blog?category=' . $category['slug']) ?>">View category</a>
+                        </div>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    </section>
+<?php endif; ?>
 <?php $content = ob_get_clean(); ?>
 <?php view('layout', compact('content')); ?>

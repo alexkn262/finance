@@ -57,7 +57,14 @@ final class PublicController
     {
         $this->ensureInstalled();
         Analytics::track('/start-here');
-        view('start-here');
+        $pdo = Database::connection();
+        $ttl = (int) Config::get('CACHE_TTL', 300);
+        $categories = Cache::remember('start_here_categories', $ttl, function () use ($pdo) {
+            $stmt = $pdo->prepare('SELECT name, slug, seo_description, featured_image FROM categories ORDER BY name ASC');
+            $stmt->execute();
+            return $stmt->fetchAll();
+        });
+        view('start-here', ['categories' => $categories]);
     }
 
     public function blog(): void

@@ -37,6 +37,9 @@ nav a:hover { color: var(--text); }
 .card:hover { transform: translateY(-4px); }
 .hero-cards { display: grid; gap: 1rem; margin-top: 2rem; }
 .hero-cards .card { background: linear-gradient(135deg, rgba(229,9,20,0.3), rgba(27,27,42,1)); }
+.section-title { display: grid; gap: 0.4rem; margin-bottom: 1.5rem; }
+.section-title h2 { margin: 0; }
+.section-title p { margin: 0; color: var(--muted); max-width: 560px; }
 .search { position: relative; }
 .search input { padding: 0.5rem 1rem; border-radius: 999px; border: 1px solid var(--card); background: var(--surface); color: var(--text); }
 .search-results { position: absolute; top: 110%; left: 0; right: 0; background: var(--surface); border-radius: 12px; display: none; padding: 0.5rem; }
