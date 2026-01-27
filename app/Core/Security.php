@@ -74,7 +74,27 @@ final class Security
         $clean = preg_replace('/on\w+\s*=\s*"[^"]*"/i', '', $clean);
         $clean = preg_replace("/javascript:/i", '', $clean);
         $clean = preg_replace('/<img[^>]+>/i', '', $clean);
-        return $clean ?? '';
+        $clean = $clean ?? '';
+        if (trim($clean) === '') {
+            return '';
+        }
+        $doc = new \DOMDocument('1.0', 'UTF-8');
+        $previous = libxml_use_internal_errors(true);
+        $doc->loadHTML(
+            '<div>' . $clean . '</div>',
+            LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+        );
+        libxml_clear_errors();
+        libxml_use_internal_errors($previous);
+        $wrapper = $doc->getElementsByTagName('div')->item(0);
+        if (!$wrapper) {
+            return $clean;
+        }
+        $output = '';
+        foreach ($wrapper->childNodes as $child) {
+            $output .= $doc->saveHTML($child);
+        }
+        return $output;
     }
 
     public static function isValidEmail(string $email): bool
