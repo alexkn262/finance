@@ -96,10 +96,11 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
         }
     };
     const animateStep = () => {
-        steps.forEach((step) => step.classList.add('fade'));
+        steps.forEach((step) => step.classList.remove('fade'));
         const active = steps[current];
         if (active) {
             active.classList.add('active');
+            active.classList.add('fade');
         }
     };
     nextButtons.forEach((button) => {
