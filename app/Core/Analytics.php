@@ -43,11 +43,12 @@ final class Analytics
         return (int) $stmt->fetchColumn();
     }
 
-    public static function trends(int $days = 7): array
+    public static function trends(int $days = 7, bool $unique = false): array
     {
         $pdo = Database::connection();
         $since = time() - ($days * 86400);
-        $stmt = $pdo->prepare('SELECT date(datetime(viewed_at, "unixepoch")) as day, COUNT(*) as views FROM analytics WHERE viewed_at >= :since GROUP BY day ORDER BY day ASC');
+        $metric = $unique ? 'COUNT(DISTINCT ip_hash)' : 'COUNT(*)';
+        $stmt = $pdo->prepare('SELECT date(datetime(viewed_at, "unixepoch")) as day, ' . $metric . ' as views FROM analytics WHERE viewed_at >= :since GROUP BY day ORDER BY day ASC');
         $stmt->execute([':since' => $since]);
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }

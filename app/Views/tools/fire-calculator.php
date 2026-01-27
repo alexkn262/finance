@@ -7,6 +7,11 @@
 </section>
 <section class="tool">
     <div class="container">
+        <div class="tool-steps">
+            <div class="card">Step 1: Add annual expenses.</div>
+            <div class="card">Step 2: Choose your withdrawal rate.</div>
+            <div class="card">Step 3: Plan your runway.</div>
+        </div>
         <form class="tool-form" data-tool="fire">
             <label>Annual expenses <input type="number" name="expenses" value="40000"></label>
             <label>Safe withdrawal rate (%) <input type="number" step="0.1" name="rate" value="4"></label>

@@ -7,6 +7,11 @@
 </section>
 <section class="tool">
     <div class="container">
+        <div class="tool-steps">
+            <div class="card">Step 1: Set your starting investment.</div>
+            <div class="card">Step 2: Add monthly contributions.</div>
+            <div class="card">Step 3: Test multiple rates and horizons.</div>
+        </div>
         <form class="tool-form" data-tool="compound">
             <label>Initial investment <input type="number" name="principal" value="1000"></label>
             <label>Monthly contribution <input type="number" name="monthly" value="200"></label>

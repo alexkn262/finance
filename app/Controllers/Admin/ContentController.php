@@ -139,8 +139,12 @@ final class ContentController
         }
         $keyword = trim((string) ($_POST['keyword'] ?? ''));
         $ai = new AiService();
-        $result = $ai->generateArticle($keyword);
-        view('admin/ai-result', ['article' => $result, 'csrf' => Security::csrfToken()]);
+        try {
+            $result = $ai->generateArticle($keyword);
+            view('admin/ai-result', ['article' => $result, 'csrf' => Security::csrfToken()]);
+        } catch (\RuntimeException $e) {
+            view('admin/ai-article', ['csrf' => Security::csrfToken(), 'error' => $e->getMessage()]);
+        }
     }
 
     public function rewriteAi(): void
@@ -152,8 +156,12 @@ final class ContentController
         }
         $content = (string) ($_POST['content'] ?? '');
         $ai = new AiService();
-        $rewrites = $ai->rewriteArticle($content);
-        view('admin/ai-rewrite', ['rewrites' => $rewrites, 'csrf' => Security::csrfToken(), 'original' => $content, 'featured_image' => $_POST['featured_image'] ?? '']);
+        try {
+            $rewrites = $ai->rewriteArticle($content);
+            view('admin/ai-rewrite', ['rewrites' => $rewrites, 'csrf' => Security::csrfToken(), 'original' => $content, 'featured_image' => $_POST['featured_image'] ?? '']);
+        } catch (\RuntimeException $e) {
+            view('admin/ai-article', ['csrf' => Security::csrfToken(), 'error' => $e->getMessage()]);
+        }
     }
 
     public function categories(): void

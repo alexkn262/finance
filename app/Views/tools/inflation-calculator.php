@@ -7,6 +7,11 @@
 </section>
 <section class="tool">
     <div class="container">
+        <div class="tool-steps">
+            <div class="card">Step 1: Enter today's price.</div>
+            <div class="card">Step 2: Set inflation assumptions.</div>
+            <div class="card">Step 3: Review your future cost.</div>
+        </div>
         <form class="tool-form" data-tool="inflation">
             <label>Current price <input type="number" name="amount" value="100"></label>
             <label>Inflation rate (%) <input type="number" step="0.1" name="rate" value="3"></label>

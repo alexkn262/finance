@@ -53,16 +53,5 @@
         </div>
     </div>
 </section>
-<section class="newsletter">
-    <div class="container">
-        <h2>Get the weekly finance brief</h2>
-        <p>Actionable insights, tools, and new guides delivered to your inbox.</p>
-        <form method="post" action="<?= base_url('/newsletter') ?>">
-            <input type="hidden" name="csrf_token" value="<?= e(csrf_token()) ?>">
-            <input type="email" name="email" placeholder="you@example.com" required>
-            <button class="btn" type="submit">Subscribe</button>
-        </form>
-    </div>
-</section>
 <?php $content = ob_get_clean(); ?>
 <?php view('layout', compact('content')); ?>

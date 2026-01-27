@@ -60,7 +60,7 @@ final class AdminController
         $stmt = $pdo->prepare('SELECT page, COUNT(*) as views FROM analytics GROUP BY page ORDER BY views DESC LIMIT 10');
         $stmt->execute();
         $topAll = $stmt->fetchAll(PDO::FETCH_ASSOC);
-        $trends = Analytics::trends(7);
+        $trends = Analytics::trends(7, true);
         view('admin/analytics', [
             'pages' => $top24h,
             'topAll' => $topAll,

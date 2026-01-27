@@ -7,6 +7,11 @@
 </section>
 <section class="tool">
     <div class="container">
+        <div class="tool-steps">
+            <div class="card">Step 1: Enter the loan balance.</div>
+            <div class="card">Step 2: Adjust APR and duration.</div>
+            <div class="card">Step 3: Compare scenarios.</div>
+        </div>
         <form class="tool-form" data-tool="loan">
             <label>Loan amount <input type="number" name="amount" value="25000"></label>
             <label>APR (%) <input type="number" step="0.1" name="rate" value="6"></label>
