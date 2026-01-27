@@ -23,7 +23,7 @@
                     <div class="card-body">
                         <h3><?= e($article['title']) ?></h3>
                         <p><?= e(excerpt($article['seo_description'] ?: ($article['content_html'] ?? ''))) ?></p>
-                        <small><?= e($article['category_name'] ?? 'General') ?> · <?= date('M d, Y', (int) $article['created_at']) ?> · Views: <?= (int) ($article['view_count'] ?? 0) ?></small>
+                        <small><a href="<?= base_url('/blog?category=' . ($article['category_slug'] ?? '')) ?>\" class=\"meta-link\"><?= e($article['category_name'] ?? 'General') ?></a> · <?= date('M d, Y', (int) $article['created_at']) ?> · Views: <?= (int) ($article['view_count'] ?? 0) ?></small>
                         <a href="<?= base_url('/blog/' . $article['slug']) ?>">Read guide</a>
                     </div>
                 </article>

@@ -22,14 +22,14 @@
                 <a class="chip<?= $currentCategory === $category['slug'] ? ' active' : '' ?>" href="<?= base_url('/blog?category=' . $category['slug']) ?>"><?= e($category['name']) ?></a>
             <?php endforeach; ?>
         </div>
-        <div class="grid">
+        <div class="grid grid-2">
             <?php foreach ($articles as $article): ?>
                 <article class="card">
                     <div class="card-media" style="background-image: url('<?= e($article['featured_image'] ?? 'https://images.unsplash.com/photo-1520607162513-77705c0f0d4a?auto=format&fit=crop&w=800&q=80') ?>')"></div>
                     <div class="card-body">
                         <h3><?= e($article['title']) ?></h3>
                         <p><?= e(excerpt($article['seo_description'] ?: ($article['content_html'] ?? ''))) ?></p>
-                        <small><?= e($article['category_name'] ?? 'General') ?> · <?= date('M d, Y', (int) $article['created_at']) ?> · Views: <?= (int) ($article['view_count'] ?? 0) ?></small>
+                        <small><a href="<?= base_url('/blog?category=' . ($article['category_slug'] ?? '')) ?>\" class=\"meta-link\"><?= e($article['category_name'] ?? 'General') ?></a> · <?= date('M d, Y', (int) $article['created_at']) ?> · Views: <?= (int) ($article['view_count'] ?? 0) ?></small>
                         <a href="<?= base_url('/blog/' . $article['slug']) ?>">Read guide</a>
                     </div>
                 </article>

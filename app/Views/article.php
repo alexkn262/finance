@@ -4,8 +4,10 @@
         <h1><?= e($article['title']) ?></h1>
         <p><?= e($article['seo_description'] ?? '') ?></p>
         <div class="article-meta">
-            <span><?= e($article['category_name'] ?? 'General') ?></span>
+            <a href="<?= base_url('/blog?category=' . ($article['category_slug'] ?? '')) ?>" class="meta-link"><?= e($article['category_name'] ?? 'General') ?></a>
             <span><?= date('M d, Y', (int) $article['created_at']) ?></span>
+            <span>Views: <?= (int) ($article['view_count'] ?? 0) ?></span>
+            <span>By Finance Editor</span>
         </div>
     </div>
 </section>
@@ -25,9 +27,9 @@
         </div>
         <div class="article-share">
             <span>Share:</span>
-            <a href="https://twitter.com/intent/tweet?url=<?= urlencode(current_url()) ?>">Twitter</a>
-            <a href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode(current_url()) ?>">Facebook</a>
-            <a href="mailto:?subject=<?= urlencode($article['title']) ?>&body=<?= urlencode(current_url()) ?>">Email</a>
+            <a class="share-btn" href="https://twitter.com/intent/tweet?url=<?= urlencode(current_url()) ?>">🐦 Twitter</a>
+            <a class="share-btn" href="https://www.facebook.com/sharer/sharer.php?u=<?= urlencode(current_url()) ?>">📘 Facebook</a>
+            <a class="share-btn" href="mailto:?subject=<?= urlencode($article['title']) ?>&body=<?= urlencode(current_url()) ?>">✉️ Email</a>
             <a href="<?= e($ampUrl) ?>">AMP Version</a>
         </div>
     </div>

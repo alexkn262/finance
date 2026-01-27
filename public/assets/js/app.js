@@ -95,11 +95,19 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
             resultButton.style.display = current === steps.length - 1 ? 'inline-flex' : 'none';
         }
     };
+    const animateStep = () => {
+        steps.forEach((step) => step.classList.add('fade'));
+        const active = steps[current];
+        if (active) {
+            active.classList.add('active');
+        }
+    };
     nextButtons.forEach((button) => {
         button.addEventListener('click', () => {
             if (current < steps.length - 1) {
                 current += 1;
                 update();
+                animateStep();
                 syncButtons();
             }
         });
@@ -109,6 +117,7 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
             if (current > 0) {
                 current -= 1;
                 update();
+                animateStep();
                 syncButtons();
             }
         });
@@ -122,5 +131,6 @@ document.querySelectorAll('[data-stepper]').forEach((stepper) => {
         });
     }
     update();
+    animateStep();
     syncButtons();
 });

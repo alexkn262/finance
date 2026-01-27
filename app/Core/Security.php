@@ -77,6 +77,18 @@ final class Security
         return $clean ?? '';
     }
 
+    public static function isValidEmail(string $email): bool
+    {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            return false;
+        }
+        if (strlen($email) > 254) {
+            return false;
+        }
+        $domain = substr(strrchr($email, '@'), 1) ?: '';
+        return $domain !== '' && preg_match('/\\./', $domain) === 1;
+    }
+
     public static function hashPassword(string $password): string
     {
         return password_hash($password, PASSWORD_DEFAULT);

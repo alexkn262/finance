@@ -2,18 +2,18 @@
 <section class="hero compact">
     <div class="container">
         <h1>Loan payment calculator</h1>
-        <p>Understand your monthly loan payment instantly.</p>
+        <p>Understand monthly payments with clear assumptions.</p>
+        <div class="article-content">
+            <p><strong>Formula:</strong> Payment = P * r / (1 - (1 + r)^-n)</p>
+            <p><strong>Where:</strong> P = loan amount, r = monthly interest rate, n = total months.</p>
+        </div>
     </div>
 </section>
 <section class="tool">
     <div class="container" data-stepper>
-        <div class="tool-steps">
-            <div class="card">Step 1: Loan amount.</div>
-            <div class="card">Step 2: Rate + term.</div>
-            <div class="card">Step 3: Review monthly payment.</div>
-        </div>
         <form class="tool-form" data-tool="loan" data-currency>
             <div class="tool-step active" data-step>
+                <h3>Step 1: Loan details</h3>
                 <label>Currency
                     <select name="currency">
                         <option value="$">$ USD</option>
@@ -27,6 +27,7 @@
                 </div>
             </div>
             <div class="tool-step" data-step>
+                <h3>Step 2: Interest + term</h3>
                 <label>APR (%) <input type="number" step="0.1" name="rate" value="6"></label>
                 <label>Years <input type="number" name="years" value="5"></label>
                 <div class="step-actions">
@@ -35,7 +36,8 @@
                 </div>
             </div>
             <div class="tool-step" data-step>
-                <p>Review your assumptions and generate the projection.</p>
+                <h3>Step 3: Review projection</h3>
+                <p>We will compute the monthly payment using your inputs.</p>
                 <div class="step-actions">
                     <button class="btn" type="button" data-prev>Back</button>
                     <button class="btn" type="button" data-show-result>Show result</button>
@@ -44,10 +46,6 @@
             <button class="btn" type="button" data-calc hidden>Calculate</button>
         </form>
         <div class="tool-result" data-result></div>
-        <div class="article-content">
-            <p>Formula: Payment = P * r / (1 - (1 + r)^-n)</p>
-            <p>The formula divides your balance into equal monthly payments based on the rate and term.</p>
-        </div>
         <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
     </div>
 </section>

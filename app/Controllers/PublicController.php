@@ -29,7 +29,7 @@ final class PublicController
         $pdo = Database::connection();
         $ttl = (int) Config::get('CACHE_TTL', 300);
         $articles = Cache::remember('home_articles', $ttl, function () use ($pdo) {
-            $stmt = $pdo->prepare("SELECT a.id, a.title, a.slug, a.seo_description, a.featured_image, a.content_html, a.created_at, c.name as category_name, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.status = 'published' ORDER BY a.published_at DESC LIMIT :limit");
+            $stmt = $pdo->prepare("SELECT a.id, a.title, a.slug, a.seo_description, a.featured_image, a.content_html, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.status = 'published' ORDER BY a.published_at DESC LIMIT :limit");
             $stmt->bindValue(':limit', 6, PDO::PARAM_INT);
             $stmt->execute();
             return $stmt->fetchAll();
@@ -71,7 +71,7 @@ final class PublicController
         $offset = ($page - 1) * $limit;
         $categoryInfo = null;
         if ($category) {
-            $stmt = $pdo->prepare("SELECT a.id, a.title, a.slug, a.seo_description, a.featured_image, a.content_html, a.created_at, c.name as category_name, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a JOIN categories c ON a.category_id = c.id WHERE a.status = 'published' AND c.slug = :slug ORDER BY a.published_at DESC LIMIT :limit OFFSET :offset");
+            $stmt = $pdo->prepare("SELECT a.id, a.title, a.slug, a.seo_description, a.featured_image, a.content_html, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a JOIN categories c ON a.category_id = c.id WHERE a.status = 'published' AND c.slug = :slug ORDER BY a.published_at DESC LIMIT :limit OFFSET :offset");
             $stmt->bindValue(':slug', $category, PDO::PARAM_STR);
             $stmt->bindValue(':limit', $limit, PDO::PARAM_INT);
             $stmt->bindValue(':offset', $offset, PDO::PARAM_INT);
@@ -111,9 +111,9 @@ final class PublicController
     public function article(array $matches): void
     {
         $this->ensureInstalled();
-        $slug = $matches[1] ?? '';
+        $slug = trim($matches[1] ?? '', '/');
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_title, a.seo_description, a.featured_image, a.created_at, c.name as category_name, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_title, a.seo_description, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug, (SELECT COUNT(*) FROM analytics WHERE page = '/blog/' || a.slug) as view_count FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
         $stmt->execute([':slug' => $slug]);
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
@@ -139,16 +139,16 @@ final class PublicController
             'seoDescription' => $article['seo_description'] ?? '',
             'prev' => $prev,
             'next' => $next,
-            'ampUrl' => base_url('/blog/' . $article['slug'] . '/amp'),
+            'ampUrl' => base_url('/blog/' . $slug . '/amp'),
         ]);
     }
 
     public function articleAmp(array $matches): void
     {
         $this->ensureInstalled();
-        $slug = $matches[1] ?? '';
+        $slug = trim($matches[1] ?? '', '/');
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.featured_image, a.created_at, c.name as category_name FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
         $stmt->execute([':slug' => $slug]);
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
@@ -316,8 +316,8 @@ final class PublicController
             http_response_code(403);
             exit('Invalid CSRF token');
         }
-        $email = filter_var($_POST['email'] ?? '', FILTER_VALIDATE_EMAIL);
-        if (!$email) {
+        $email = (string) ($_POST['email'] ?? '');
+        if (!Security::isValidEmail($email)) {
             http_response_code(422);
             exit('Invalid email');
         }

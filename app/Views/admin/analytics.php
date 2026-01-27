@@ -42,7 +42,8 @@
                 bar.className = 'chart-bar';
                 bar.style.setProperty('--value', trend.views);
                 const label = document.createElement('span');
-                label.textContent = trend.day;
+                const date = new Date(trend.day);
+                label.textContent = date.toLocaleDateString(undefined, { day: '2-digit', month: 'short' });
                 bar.appendChild(label);
                 chart.appendChild(bar);
             });
