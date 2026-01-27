@@ -47,6 +47,7 @@ final class InstallerController
             'seo_description' => $_POST['seo_description'] ?? 'Premium finance education, tools, and guides.',
             'newsletter_status' => 'enabled',
         ]);
+        Installer::seedDemoContent();
         Config::set('APP_NAME', $_POST['site_name']);
         Config::set('APP_URL', $_POST['site_url']);
         Installer::lock();

@@ -32,7 +32,6 @@ $nonce = App\Core\Security::cspNonce();
                 <a href="<?= base_url('/start-here') ?>">Start Here</a>
                 <a href="<?= base_url('/blog') ?>">Guides</a>
                 <a href="<?= base_url('/tools') ?>">Tools</a>
-                <a href="<?= base_url('/admin') ?>">Admin</a>
             </nav>
             <div class="search">
                 <input id="live-search" type="search" placeholder="Search guides...">

@@ -102,4 +102,59 @@ final class Installer
             $stmt->execute([':key' => $key, ':value' => $value]);
         }
     }
+
+    public static function seedDemoContent(): void
+    {
+        $pdo = Database::connection();
+        $now = time();
+        $categoryStmt = $pdo->prepare('INSERT INTO categories (name, slug, parent_id, seo_title, seo_description, created_at) VALUES (:name, :slug, :parent_id, :seo_title, :seo_description, :created_at)');
+        $categoryStmt->execute([
+            ':name' => 'Smart Investing',
+            ':slug' => 'smart-investing',
+            ':parent_id' => null,
+            ':seo_title' => 'Smart Investing Guides',
+            ':seo_description' => 'Evidence-based investment strategies, portfolio structure, and long-term planning.',
+            ':created_at' => $now,
+        ]);
+        $investingId = (int) $pdo->lastInsertId();
+        $categoryStmt->execute([
+            ':name' => 'Money Fundamentals',
+            ':slug' => 'money-fundamentals',
+            ':parent_id' => null,
+            ':seo_title' => 'Money Fundamentals',
+            ':seo_description' => 'Core money skills for budgeting, saving, and building a strong foundation.',
+            ':created_at' => $now,
+        ]);
+        $fundamentalsId = (int) $pdo->lastInsertId();
+
+        $articleStmt = $pdo->prepare('INSERT INTO articles (title, slug, category_id, content_html, featured_image, status, seo_title, seo_description, ai_generated, created_at, updated_at, published_at) VALUES (:title, :slug, :category_id, :content_html, :featured_image, :status, :seo_title, :seo_description, :ai_generated, :created_at, :updated_at, :published_at)');
+        $articleStmt->execute([
+            ':title' => 'The Smart Investor Blueprint',
+            ':slug' => 'smart-investor-blueprint',
+            ':category_id' => $investingId,
+            ':content_html' => Security::sanitizeHtml('<h2>Build a resilient portfolio</h2><p>Learn how to structure a portfolio using diversified funds, rebalancing rhythms, and risk-aware allocation that fits your timeline.</p><h3>Key takeaways</h3><ul><li>Define your risk band and time horizon.</li><li>Use low-cost index funds as a core.</li><li>Rebalance quarterly to stay aligned.</li></ul>'),
+            ':featured_image' => 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1400&q=80',
+            ':status' => 'published',
+            ':seo_title' => 'The Smart Investor Blueprint',
+            ':seo_description' => 'A step-by-step guide to building a resilient portfolio with diversified index funds and clear allocation targets.',
+            ':ai_generated' => 0,
+            ':created_at' => $now,
+            ':updated_at' => $now,
+            ':published_at' => $now,
+        ]);
+        $articleStmt->execute([
+            ':title' => 'Money Basics: Your First 90 Days',
+            ':slug' => 'money-basics-first-90-days',
+            ':category_id' => $fundamentalsId,
+            ':content_html' => Security::sanitizeHtml('<h2>Stabilize your cash flow</h2><p>Map your income, build a lean budget, and automate savings to create momentum in the first three months.</p><h3>Quick wins</h3><ul><li>Track every expense weekly.</li><li>Automate a 10% savings rule.</li><li>Reduce fixed costs in week two.</li></ul>'),
+            ':featured_image' => 'https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1400&q=80',
+            ':status' => 'published',
+            ':seo_title' => 'Money Basics: Your First 90 Days',
+            ':seo_description' => 'A 90-day roadmap to stabilize spending, automate savings, and build sustainable money habits.',
+            ':ai_generated' => 0,
+            ':created_at' => $now,
+            ':updated_at' => $now,
+            ':published_at' => $now,
+        ]);
+    }
 }
