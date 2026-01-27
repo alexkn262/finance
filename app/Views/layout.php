@@ -11,6 +11,10 @@ $nonce = App\Core\Security::cspNonce();
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= e($seoTitle) ?></title>
     <meta name="description" content="<?= e($seoDescription) ?>">
+    <link rel="canonical" href="<?= current_url() ?>">
+    <?php if (!empty($ampUrl)): ?>
+        <link rel="amphtml" href="<?= e($ampUrl) ?>">
+    <?php endif; ?>
     <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
     <script defer src="<?= asset_url('assets/js/app.js') ?>" nonce="<?= e($nonce) ?>"></script>
     <script type="application/ld+json" nonce="<?= e($nonce) ?>"><?= json_encode([

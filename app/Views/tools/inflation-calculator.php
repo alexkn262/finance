@@ -12,8 +12,15 @@
             <div class="card">Step 2: Inflation assumptions.</div>
             <div class="card">Step 3: Review future cost.</div>
         </div>
-        <form class="tool-form" data-tool="inflation">
+        <form class="tool-form" data-tool="inflation" data-currency>
             <div class="tool-step active" data-step>
+                <label>Currency
+                    <select name="currency">
+                        <option value="$">$ USD</option>
+                        <option value="€">€ EUR</option>
+                        <option value="£">£ GBP</option>
+                    </select>
+                </label>
                 <label>Current price <input type="number" name="amount" value="100"></label>
                 <div class="step-actions">
                     <button class="btn" type="button" data-next>Next</button>
@@ -39,6 +46,7 @@
         <div class="tool-result" data-result></div>
         <div class="article-content">
             <p>Formula: Future price = Current price × (1 + inflation rate)^years</p>
+            <p>This projects purchasing power loss over time.</p>
         </div>
         <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
     </div>

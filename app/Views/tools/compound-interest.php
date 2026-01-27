@@ -12,8 +12,15 @@
             <div class="card">Step 2: Growth assumptions.</div>
             <div class="card">Step 3: Review projection.</div>
         </div>
-        <form class="tool-form" data-tool="compound">
+        <form class="tool-form" data-tool="compound" data-currency>
             <div class="tool-step active" data-step>
+                <label>Currency
+                    <select name="currency">
+                        <option value="$">$ USD</option>
+                        <option value="€">€ EUR</option>
+                        <option value="£">£ GBP</option>
+                    </select>
+                </label>
                 <label>Initial investment <input type="number" name="principal" value="1000"></label>
                 <label>Monthly contribution <input type="number" name="monthly" value="200"></label>
                 <div class="step-actions">
@@ -40,6 +47,7 @@
         <div class="tool-result" data-result></div>
         <div class="article-content">
             <p>Formula: FV = P(1+r/n)^{nt} + PMT((1+r/n)^{nt}-1)/(r/n)</p>
+            <p>This formula compounds your starting balance and adds monthly contributions each period.</p>
         </div>
         <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
     </div>

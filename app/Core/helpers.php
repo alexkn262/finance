@@ -57,3 +57,12 @@ function config(string $key, mixed $default = null): mixed
 {
     return Config::get($key, $default);
 }
+
+function excerpt(string $text, int $limit = 140): string
+{
+    $plain = trim(strip_tags($text));
+    if (mb_strlen($plain) <= $limit) {
+        return $plain;
+    }
+    return rtrim(mb_substr($plain, 0, $limit)) . '...';
+}

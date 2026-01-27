@@ -68,6 +68,15 @@ final class AdminController
         ]);
     }
 
+    public function analyticsData(): void
+    {
+        $this->requireAuth();
+        header('Content-Type: application/json');
+        echo json_encode([
+            'trends' => Analytics::trends(7, true),
+        ]);
+    }
+
     public function pageAnalytics(): void
     {
         $this->requireAuth();

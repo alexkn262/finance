@@ -12,8 +12,15 @@
             <div class="card">Step 2: Withdrawal rate.</div>
             <div class="card">Step 3: Review target.</div>
         </div>
-        <form class="tool-form" data-tool="fire">
+        <form class="tool-form" data-tool="fire" data-currency>
             <div class="tool-step active" data-step>
+                <label>Currency
+                    <select name="currency">
+                        <option value="$">$ USD</option>
+                        <option value="€">€ EUR</option>
+                        <option value="£">£ GBP</option>
+                    </select>
+                </label>
                 <label>Annual expenses <input type="number" name="expenses" value="40000"></label>
                 <div class="step-actions">
                     <button class="btn" type="button" data-next>Next</button>
@@ -38,6 +45,7 @@
         <div class="tool-result" data-result></div>
         <div class="article-content">
             <p>Formula: Target = Annual expenses / withdrawal rate</p>
+            <p>This estimates the portfolio size needed to sustain your expenses.</p>
         </div>
         <p class="disclaimer">This calculator is for educational purposes only and not financial advice.</p>
     </div>

@@ -21,6 +21,7 @@ final class App
         Security::startSession();
         $pdo = Database::connection();
         if (Installer::isInstalled()) {
+            Installer::runMigrations();
             $stmt = $pdo->prepare('SELECT key, value FROM settings');
             $stmt->execute();
             foreach ($stmt->fetchAll(PDO::FETCH_ASSOC) as $row) {
@@ -46,6 +47,7 @@ final class App
         $this->router->get('/start-here', [new PublicController(), 'startHere']);
         $this->router->get('/blog', [new PublicController(), 'blog']);
         $this->router->getPattern('#^/blog/([^/]+)$#', [new PublicController(), 'article']);
+        $this->router->getPattern('#^/blog/([^/]+)/amp$#', [new PublicController(), 'articleAmp']);
         $this->router->get('/tools', [new PublicController(), 'tools']);
         $this->router->get('/tools/compound-interest', [new PublicController(), 'compoundInterest']);
         $this->router->get('/tools/loan-calculator', [new PublicController(), 'loanCalculator']);
@@ -63,6 +65,7 @@ final class App
         $this->router->get('/unsubscribe', [new PublicController(), 'unsubscribe']);
         $this->router->get('/admin/analytics', [new AdminController(), 'analytics']);
         $this->router->get('/admin/analytics/page', [new AdminController(), 'pageAnalytics']);
+        $this->router->get('/admin/analytics/data', [new AdminController(), 'analyticsData']);
         $this->router->get('/admin/newsletter', [new AdminController(), 'newsletter']);
         $this->router->post('/admin/newsletter/send', [new AdminController(), 'sendNewsletter']);
         $this->router->post('/admin/newsletter/delete', [new AdminController(), 'deleteSubscriber']);
