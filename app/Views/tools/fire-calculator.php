@@ -6,16 +6,34 @@
     </div>
 </section>
 <section class="tool">
-    <div class="container">
+    <div class="container" data-stepper>
         <div class="tool-steps">
-            <div class="card">Step 1: Add annual expenses.</div>
-            <div class="card">Step 2: Choose your withdrawal rate.</div>
-            <div class="card">Step 3: Plan your runway.</div>
+            <div class="card">Step 1: Annual expenses.</div>
+            <div class="card">Step 2: Withdrawal rate.</div>
+            <div class="card">Step 3: Review target.</div>
         </div>
         <form class="tool-form" data-tool="fire">
-            <label>Annual expenses <input type="number" name="expenses" value="40000"></label>
-            <label>Safe withdrawal rate (%) <input type="number" step="0.1" name="rate" value="4"></label>
-            <button class="btn" type="button" data-calc>Calculate</button>
+            <div class="tool-step active" data-step>
+                <label>Annual expenses <input type="number" name="expenses" value="40000"></label>
+                <div class="step-actions">
+                    <button class="btn" type="button" data-next>Next</button>
+                </div>
+            </div>
+            <div class="tool-step" data-step>
+                <label>Safe withdrawal rate (%) <input type="number" step="0.1" name="rate" value="4"></label>
+                <div class="step-actions">
+                    <button class="btn" type="button" data-prev>Back</button>
+                    <button class="btn" type="button" data-next>Next</button>
+                </div>
+            </div>
+            <div class="tool-step" data-step>
+                <p>Review your assumptions and generate the projection.</p>
+                <div class="step-actions">
+                    <button class="btn" type="button" data-prev>Back</button>
+                    <button class="btn" type="button" data-show-result>Show result</button>
+                </div>
+            </div>
+            <button class="btn" type="button" data-calc hidden>Calculate</button>
         </form>
         <div class="tool-result" data-result></div>
         <div class="article-content">

@@ -77,3 +77,41 @@ document.querySelectorAll('[data-calc]').forEach((button) => {
         result.textContent = output;
     });
 });
+
+document.querySelectorAll('[data-stepper]').forEach((stepper) => {
+    const steps = stepper.querySelectorAll('[data-step]');
+    const nextButtons = stepper.querySelectorAll('[data-next]');
+    const prevButtons = stepper.querySelectorAll('[data-prev]');
+    const resultButton = stepper.querySelector('[data-show-result]');
+    let current = 0;
+    const update = () => {
+        steps.forEach((step, index) => {
+            step.classList.toggle('active', index === current);
+        });
+    };
+    nextButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            if (current < steps.length - 1) {
+                current += 1;
+                update();
+            }
+        });
+    });
+    prevButtons.forEach((button) => {
+        button.addEventListener('click', () => {
+            if (current > 0) {
+                current -= 1;
+                update();
+            }
+        });
+    });
+    if (resultButton) {
+        resultButton.addEventListener('click', () => {
+            const calcButton = stepper.querySelector('[data-calc]');
+            if (calcButton) {
+                calcButton.click();
+            }
+        });
+    }
+    update();
+});

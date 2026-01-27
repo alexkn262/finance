@@ -6,18 +6,36 @@
     </div>
 </section>
 <section class="tool">
-    <div class="container">
+    <div class="container" data-stepper>
         <div class="tool-steps">
-            <div class="card">Step 1: Set your starting investment.</div>
-            <div class="card">Step 2: Add monthly contributions.</div>
-            <div class="card">Step 3: Test multiple rates and horizons.</div>
+            <div class="card">Step 1: Starting balance + contribution details.</div>
+            <div class="card">Step 2: Growth assumptions.</div>
+            <div class="card">Step 3: Review projection.</div>
         </div>
         <form class="tool-form" data-tool="compound">
-            <label>Initial investment <input type="number" name="principal" value="1000"></label>
-            <label>Monthly contribution <input type="number" name="monthly" value="200"></label>
-            <label>Annual return (%) <input type="number" step="0.1" name="rate" value="7"></label>
-            <label>Years <input type="number" name="years" value="20"></label>
-            <button class="btn" type="button" data-calc>Calculate</button>
+            <div class="tool-step active" data-step>
+                <label>Initial investment <input type="number" name="principal" value="1000"></label>
+                <label>Monthly contribution <input type="number" name="monthly" value="200"></label>
+                <div class="step-actions">
+                    <button class="btn" type="button" data-next>Next</button>
+                </div>
+            </div>
+            <div class="tool-step" data-step>
+                <label>Annual return (%) <input type="number" step="0.1" name="rate" value="7"></label>
+                <label>Years <input type="number" name="years" value="20"></label>
+                <div class="step-actions">
+                    <button class="btn" type="button" data-prev>Back</button>
+                    <button class="btn" type="button" data-next>Next</button>
+                </div>
+            </div>
+            <div class="tool-step" data-step>
+                <p>Review your assumptions and generate the projection.</p>
+                <div class="step-actions">
+                    <button class="btn" type="button" data-prev>Back</button>
+                    <button class="btn" type="button" data-show-result>Show result</button>
+                </div>
+            </div>
+            <button class="btn" type="button" data-calc hidden>Calculate</button>
         </form>
         <div class="tool-result" data-result></div>
         <div class="article-content">
