@@ -45,7 +45,11 @@ final class PublicController
             ['title' => 'FIRE Calculator', 'url' => '/tools/fire-calculator'],
             ['title' => 'Real Inflation Calculator', 'url' => '/tools/inflation-calculator'],
         ];
-        $seoImage = $articles[0]['featured_image'] ?? Config::get('seo_image');
+        $seoImage = null;
+        if (!empty($articles) && !empty($articles[0]['featured_image'])) {
+            $seoImage = $articles[0]['featured_image'];
+        }
+        $seoImage = $seoImage ?: Config::get('seo_image');
         view('home', [
             'articles' => $articles,
             'categories' => $categories,
@@ -89,7 +93,11 @@ final class PublicController
             $stmt->execute();
             return $stmt->fetchAll();
         });
-        $seoImage = $categories[0]['featured_image'] ?? Config::get('seo_image');
+        $seoImage = null;
+        if (!empty($categories) && !empty($categories[0]['featured_image'])) {
+            $seoImage = $categories[0]['featured_image'];
+        }
+        $seoImage = $seoImage ?: Config::get('seo_image');
         view('start-here', [
             'categories' => $categories,
             'seoTitle' => 'Start Here: Your Finance Roadmap',
@@ -158,7 +166,12 @@ final class PublicController
             $categories = $categoryStmt->fetchAll();
         $seoTitle = $categoryInfo['seo_title'] ?? (($categoryInfo['name'] ?? 'Finance Guides') . ' Guides');
         $seoDescription = $categoryInfo['seo_description'] ?? 'Explore finance guides built for long-term wealth.';
-        $seoImage = $categoryInfo['featured_image'] ?? ($articles[0]['featured_image'] ?? Config::get('seo_image'));
+        $seoImage = Config::get('seo_image');
+        if (!empty($categoryInfo['featured_image'])) {
+            $seoImage = $categoryInfo['featured_image'];
+        } elseif (!empty($articles) && !empty($articles[0]['featured_image'])) {
+            $seoImage = $articles[0]['featured_image'];
+        }
         $breadcrumbs = [
             ['name' => 'Home', 'url' => base_url('/')],
             ['name' => 'Guides', 'url' => base_url('/blog')],
@@ -186,12 +199,15 @@ final class PublicController
                 'description' => $seoDescription,
                 'url' => base_url($category ? '/blog?category=' . $category : '/blog'),
                 'hasPart' => array_map(static function (array $article): array {
-                    return [
+                    $data = [
                         '@type' => 'Article',
                         'headline' => $article['title'],
                         'url' => base_url('/blog/' . $article['slug']),
-                        'image' => $article['featured_image'] ?? null,
                     ];
+                    if (!empty($article['featured_image'])) {
+                        $data['image'] = [$article['featured_image']];
+                    }
+                    return $data;
                 }, $articles),
                 'isPartOf' => [
                     '@type' => 'WebSite',
@@ -210,7 +226,11 @@ final class PublicController
         $stmt = $pdo->prepare("SELECT c.id, c.name, c.slug, c.seo_description, c.featured_image, c.created_at, (SELECT COUNT(*) FROM articles a WHERE a.category_id = c.id AND a.status = 'published') as article_count FROM categories c ORDER BY c.name ASC");
         $stmt->execute();
         $categories = $stmt->fetchAll();
-        $seoImage = $categories[0]['featured_image'] ?? Config::get('seo_image');
+        $seoImage = null;
+        if (!empty($categories) && !empty($categories[0]['featured_image'])) {
+            $seoImage = $categories[0]['featured_image'];
+        }
+        $seoImage = $seoImage ?: Config::get('seo_image');
         view('categories', [
             'categories' => $categories,
             'seoTitle' => 'Finance Categories',
@@ -228,12 +248,15 @@ final class PublicController
                 'description' => 'Browse every finance category with featured guides and deep-dive learning paths.',
                 'url' => base_url('/categories'),
                 'hasPart' => array_map(static function (array $category): array {
-                    return [
+                    $data = [
                         '@type' => 'CollectionPage',
                         'name' => $category['name'],
                         'url' => base_url('/blog?category=' . $category['slug']),
-                        'image' => $category['featured_image'] ?? null,
                     ];
+                    if (!empty($category['featured_image'])) {
+                        $data['image'] = [$category['featured_image']];
+                    }
+                    return $data;
                 }, $categories),
                 'isPartOf' => [
                     '@type' => 'WebSite',
@@ -278,6 +301,41 @@ final class PublicController
         $stmt->execute([':id' => $article['id']]);
         $next = $stmt->fetch(PDO::FETCH_ASSOC);
         $seoDescription = $article['seo_description'] ?: excerpt($article['content_html'] ?? '');
+        $logoUrl = Config::get('seo_logo', Config::get('seo_image'));
+        $articleSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => $article['title'],
+            'description' => $seoDescription,
+            'datePublished' => date('c', (int) $article['created_at']),
+            'dateModified' => date('c', (int) $article['created_at']),
+            'author' => [
+                '@type' => 'Organization',
+                'name' => 'Finance Editorial Team',
+            ],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => Config::get('APP_NAME', 'Finance'),
+            ],
+            'mainEntityOfPage' => base_url('/blog/' . $slug),
+            'isPartOf' => [
+                '@type' => 'WebSite',
+                'name' => Config::get('APP_NAME', 'Finance'),
+                'url' => base_url('/'),
+            ],
+        ];
+        if (!empty($article['featured_image'])) {
+            $articleSchema['image'] = [$article['featured_image']];
+        }
+        if (!empty($article['category_name'])) {
+            $articleSchema['articleSection'] = $article['category_name'];
+        }
+        if (!empty($logoUrl)) {
+            $articleSchema['publisher']['logo'] = [
+                '@type' => 'ImageObject',
+                'url' => $logoUrl,
+            ];
+        }
         view('article', [
             'article' => $article,
             'comments' => $comments,
@@ -293,38 +351,13 @@ final class PublicController
             'seoModified' => date('c', (int) $article['created_at']),
             'seoSection' => $article['category_name'] ?? null,
             'schemaType' => 'Article',
-            'schemaData' => [
-                '@context' => 'https://schema.org',
-                '@type' => 'Article',
-                'headline' => $article['title'],
-                'description' => $seoDescription,
-                'image' => $article['featured_image'] ? [$article['featured_image']] : null,
-                'datePublished' => date('c', (int) $article['created_at']),
-                'dateModified' => date('c', (int) $article['created_at']),
-                'author' => [
-                    '@type' => 'Organization',
-                    'name' => 'Finance Editorial Team',
-                ],
-                'publisher' => [
-                    '@type' => 'Organization',
-                    'name' => Config::get('APP_NAME', 'Finance'),
-                    'logo' => [
-                        '@type' => 'ImageObject',
-                        'url' => $article['featured_image'] ?? Config::get('seo_image', ''),
-                    ],
-                ],
-                'mainEntityOfPage' => base_url('/blog/' . $slug),
-                'articleSection' => $article['category_name'] ?? null,
-                'isPartOf' => [
-                    '@type' => 'WebSite',
-                    'name' => Config::get('APP_NAME', 'Finance'),
-                    'url' => base_url('/'),
-                ],
-            ],
+            'schemaData' => $articleSchema,
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => base_url('/')],
                 ['name' => 'Guides', 'url' => base_url('/blog')],
-                ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog?category=' . ($article['category_slug'] ?? ''))],
+                $article['category_slug']
+                    ? ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog?category=' . $article['category_slug'])]
+                    : ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog')],
                 ['name' => $article['title']],
             ],
         ]);
@@ -354,6 +387,30 @@ final class PublicController
         $article['content_html'] = Security::sanitizeHtml($article['content_html'] ?? '');
         $article['slug'] = $slug;
         $seoDescription = $article['seo_description'] ?: excerpt($article['content_html'] ?? '');
+        $logoUrl = Config::get('seo_logo', Config::get('seo_image'));
+        $ampSchema = [
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => $article['title'],
+            'description' => $seoDescription,
+            'datePublished' => date('c', (int) $article['created_at']),
+            'dateModified' => date('c', (int) $article['created_at']),
+            'author' => ['@type' => 'Organization', 'name' => 'Finance Editorial Team'],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => Config::get('APP_NAME', 'Finance'),
+            ],
+            'mainEntityOfPage' => base_url('/blog/' . $slug),
+        ];
+        if (!empty($article['featured_image'])) {
+            $ampSchema['image'] = [$article['featured_image']];
+        }
+        if (!empty($logoUrl)) {
+            $ampSchema['publisher']['logo'] = [
+                '@type' => 'ImageObject',
+                'url' => $logoUrl,
+            ];
+        }
         view('article-amp', [
             'article' => $article,
             'seoTitle' => $article['title'],
@@ -365,9 +422,12 @@ final class PublicController
             'breadcrumbs' => [
                 ['name' => 'Home', 'url' => base_url('/')],
                 ['name' => 'Guides', 'url' => base_url('/blog')],
-                ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog?category=' . ($article['category_slug'] ?? ''))],
+                $article['category_slug']
+                    ? ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog?category=' . $article['category_slug'])]
+                    : ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog')],
                 ['name' => $article['title']],
             ],
+            'schemaData' => $ampSchema,
         ]);
     }
 

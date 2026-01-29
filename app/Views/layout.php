@@ -61,6 +61,9 @@ if (!empty($schemaData)) {
 if (!empty($breadcrumbs)) {
     $breadcrumbItems = [];
     foreach ($breadcrumbs as $index => $crumb) {
+        if (empty($crumb['url'])) {
+            $crumb['url'] = $seoUrl;
+        }
         $breadcrumbItems[] = [
             '@type' => 'ListItem',
             'position' => $index + 1,
@@ -114,7 +117,7 @@ if (!empty($breadcrumbs)) {
     <link rel="stylesheet" href="<?= asset_url('assets/css/style.css') ?>">
     <script defer src="<?= asset_url('assets/js/app.js') ?>" nonce="<?= e($nonce) ?>"></script>
     <?php foreach ($schemaBlocks as $schemaBlock): ?>
-        <script type="application/ld+json" nonce="<?= e($nonce) ?>"><?= json_encode($schemaBlock, JSON_UNESCAPED_SLASHES) ?></script>
+        <script type="application/ld+json" nonce="<?= e($nonce) ?>"><?= json_encode($schemaBlock, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?></script>
     <?php endforeach; ?>
 </head>
 <body class="dark">

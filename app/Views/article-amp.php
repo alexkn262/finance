@@ -24,27 +24,11 @@ $seoImage = $seoImage ?? ($article['featured_image'] ?? config('seo_image'));
     <meta name="twitter:description" content="<?= e($seoDescription ?: excerpt($article['content_html'] ?? '')) ?>">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <script async src="https://cdn.ampproject.org/v0.js"></script>
-    <script type="application/ld+json">
-        <?= json_encode([
-            '@context' => 'https://schema.org',
-            '@type' => 'Article',
-            'headline' => $article['title'],
-            'description' => $seoDescription ?? '',
-            'image' => !empty($article['featured_image']) ? [$article['featured_image']] : null,
-            'datePublished' => date('c', (int) $article['created_at']),
-            'dateModified' => date('c', (int) $article['created_at']),
-            'author' => ['@type' => 'Organization', 'name' => 'Finance Editorial Team'],
-            'publisher' => [
-                '@type' => 'Organization',
-                'name' => config('APP_NAME', 'Finance'),
-                'logo' => [
-                    '@type' => 'ImageObject',
-                    'url' => $article['featured_image'] ?? config('seo_image', ''),
-                ],
-            ],
-            'mainEntityOfPage' => base_url('/blog/' . $article['slug']),
-        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
-    </script>
+    <?php if (!empty($schemaData)): ?>
+        <script type="application/ld+json">
+            <?= json_encode($schemaData, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+        </script>
+    <?php endif; ?>
     <?php if (!empty($breadcrumbs)): ?>
         <script type="application/ld+json">
             <?= json_encode([

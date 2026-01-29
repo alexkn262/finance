@@ -2,7 +2,7 @@
 <?php
 $seoTitle = $seoTitle ?? 'Finance Categories';
 $seoDescription = $seoDescription ?? 'Browse every finance category with featured guides and deep-dive learning paths.';
-$seoImage = $seoImage ?? (config('seo_image') ?: ($categories[0]['featured_image'] ?? ''));
+$seoImage = $seoImage ?? config('seo_image');
 ?>
 <section class="hero compact">
     <div class="container">
