@@ -190,7 +190,7 @@ final class AdminController
         }
         $pdo = Database::connection();
         $stmt = $pdo->prepare('INSERT OR REPLACE INTO settings (key, value) VALUES (:key, :value)');
-        foreach (['site_name', 'site_url', 'seo_title', 'seo_description', 'seo_tools', 'seo_home', 'ga4_id', 'adsense_code', 'openai_api_key', 'paraphrase_api_1', 'paraphrase_api_2', 'paraphrase_api_3', 'paraphrase_api_4'] as $key) {
+        foreach (['site_name', 'site_url', 'seo_title', 'seo_description', 'seo_home', 'seo_tools', 'seo_image', 'ga4_id', 'adsense_code', 'openai_api_key', 'paraphrase_api_1', 'paraphrase_api_2', 'paraphrase_api_3', 'paraphrase_api_4'] as $key) {
             if (array_key_exists($key, $_POST)) {
                 $stmt->execute([':key' => $key, ':value' => $_POST[$key]]);
             }

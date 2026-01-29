@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Terms of Service';
+$seoDescription = $seoDescription ?? 'Review terms, conditions, and usage guidelines for the finance platform.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Terms of service</h1>

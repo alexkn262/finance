@@ -23,6 +23,7 @@
             <label>Base URL <input type="url" name="site_url" required></label>
             <label>SEO title <input type="text" name="seo_title"></label>
             <label>SEO description <input type="text" name="seo_description"></label>
+            <label>SEO default image <input type="text" name="seo_image" placeholder="https://"></label>
             <label>Admin name <input type="text" name="admin_name" required></label>
             <label>Admin email <input type="email" name="admin_email" required></label>
             <label>Admin password <input type="password" name="admin_password" required></label>

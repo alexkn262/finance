@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? config('seo_home', 'Finance Education Platform');
+$seoDescription = $seoDescription ?? config('seo_description', 'Modern finance education, tools, and guides.');
+$seoImage = $seoImage ?? (config('seo_image') ?: ($articles[0]['featured_image'] ?? ''));
+?>
 <section class="hero">
     <div class="container">
         <div class="hero-content">

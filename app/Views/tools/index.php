@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? config('seo_tools', 'Finance Tools');
+$seoDescription = $seoDescription ?? 'Interactive finance calculators with transparent formulas and clear explanations.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Finance tools</h1>

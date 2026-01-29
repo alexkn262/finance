@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Page not found';
+$seoDescription = $seoDescription ?? 'The page you requested could not be found.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Page not found</h1>

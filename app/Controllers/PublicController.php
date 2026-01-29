@@ -45,11 +45,36 @@ final class PublicController
             ['title' => 'FIRE Calculator', 'url' => '/tools/fire-calculator'],
             ['title' => 'Real Inflation Calculator', 'url' => '/tools/inflation-calculator'],
         ];
+        $seoImage = $articles[0]['featured_image'] ?? Config::get('seo_image');
         view('home', [
             'articles' => $articles,
             'categories' => $categories,
             'tools' => $tools,
             'siteName' => Config::get('APP_NAME', 'Finance'),
+            'seoTitle' => Config::get('seo_home', 'Finance Education Platform'),
+            'seoDescription' => Config::get('seo_description', 'Modern finance education, tools, and guides.'),
+            'seoImage' => $seoImage ?: null,
+            'seoType' => 'website',
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => Config::get('seo_home', 'Finance Education Platform'),
+                'description' => Config::get('seo_description', 'Modern finance education, tools, and guides.'),
+                'url' => base_url('/'),
+                'primaryImageOfPage' => [
+                    '@type' => 'ImageObject',
+                    'url' => $seoImage ?: Config::get('seo_image', ''),
+                ],
+                'isPartOf' => [
+                    '@type' => 'WebSite',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'url' => base_url('/'),
+                ],
+            ],
         ]);
     }
 
@@ -64,7 +89,34 @@ final class PublicController
             $stmt->execute();
             return $stmt->fetchAll();
         });
-        view('start-here', ['categories' => $categories]);
+        $seoImage = $categories[0]['featured_image'] ?? Config::get('seo_image');
+        view('start-here', [
+            'categories' => $categories,
+            'seoTitle' => 'Start Here: Your Finance Roadmap',
+            'seoDescription' => 'Beginner to advanced finance paths with curated categories and step-by-step guides.',
+            'seoImage' => $seoImage ?: null,
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Start Here'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Start Here: Your Finance Roadmap',
+                'description' => 'Beginner to advanced finance paths with curated categories and step-by-step guides.',
+                'url' => base_url('/start-here'),
+                'primaryImageOfPage' => [
+                    '@type' => 'ImageObject',
+                    'url' => $seoImage ?: Config::get('seo_image', ''),
+                ],
+                'isPartOf' => [
+                    '@type' => 'WebSite',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'url' => base_url('/'),
+                ],
+            ],
+        ]);
     }
 
     public function blog(): void
@@ -87,7 +139,7 @@ final class PublicController
             $countStmt = $pdo->prepare("SELECT COUNT(*) FROM articles a JOIN categories c ON a.category_id = c.id WHERE a.status = 'published' AND c.slug = :slug");
             $countStmt->execute([':slug' => $category]);
             $total = (int) $countStmt->fetchColumn();
-            $infoStmt = $pdo->prepare('SELECT name, seo_description FROM categories WHERE slug = :slug');
+            $infoStmt = $pdo->prepare('SELECT name, seo_title, seo_description, featured_image FROM categories WHERE slug = :slug');
             $infoStmt->execute([':slug' => $category]);
             $categoryInfo = $infoStmt->fetch(PDO::FETCH_ASSOC) ?: null;
         } else {
@@ -104,6 +156,16 @@ final class PublicController
             $categoryStmt = $pdo->prepare('SELECT name, slug, featured_image FROM categories ORDER BY name ASC');
             $categoryStmt->execute();
             $categories = $categoryStmt->fetchAll();
+        $seoTitle = $categoryInfo['seo_title'] ?? (($categoryInfo['name'] ?? 'Finance Guides') . ' Guides');
+        $seoDescription = $categoryInfo['seo_description'] ?? 'Explore finance guides built for long-term wealth.';
+        $seoImage = $categoryInfo['featured_image'] ?? ($articles[0]['featured_image'] ?? Config::get('seo_image'));
+        $breadcrumbs = [
+            ['name' => 'Home', 'url' => base_url('/')],
+            ['name' => 'Guides', 'url' => base_url('/blog')],
+        ];
+        if ($categoryInfo) {
+            $breadcrumbs[] = ['name' => $categoryInfo['name']];
+        }
         view('blog', [
             'articles' => $articles,
             'categories' => $categories,
@@ -112,6 +174,31 @@ final class PublicController
             'totalPages' => $totalPages,
             'categoryInfo' => $categoryInfo,
             'totalArticles' => $total,
+            'seoTitle' => $seoTitle,
+            'seoDescription' => $seoDescription,
+            'seoImage' => $seoImage ?: null,
+            'schemaType' => 'CollectionPage',
+            'breadcrumbs' => $breadcrumbs,
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'CollectionPage',
+                'name' => $seoTitle,
+                'description' => $seoDescription,
+                'url' => base_url($category ? '/blog?category=' . $category : '/blog'),
+                'hasPart' => array_map(static function (array $article): array {
+                    return [
+                        '@type' => 'Article',
+                        'headline' => $article['title'],
+                        'url' => base_url('/blog/' . $article['slug']),
+                        'image' => $article['featured_image'] ?? null,
+                    ];
+                }, $articles),
+                'isPartOf' => [
+                    '@type' => 'WebSite',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'url' => base_url('/'),
+                ],
+            ],
         ]);
     }
 
@@ -123,7 +210,38 @@ final class PublicController
         $stmt = $pdo->prepare("SELECT c.id, c.name, c.slug, c.seo_description, c.featured_image, c.created_at, (SELECT COUNT(*) FROM articles a WHERE a.category_id = c.id AND a.status = 'published') as article_count FROM categories c ORDER BY c.name ASC");
         $stmt->execute();
         $categories = $stmt->fetchAll();
-        view('categories', ['categories' => $categories]);
+        $seoImage = $categories[0]['featured_image'] ?? Config::get('seo_image');
+        view('categories', [
+            'categories' => $categories,
+            'seoTitle' => 'Finance Categories',
+            'seoDescription' => 'Browse every finance category with featured guides and deep-dive learning paths.',
+            'seoImage' => $seoImage ?: null,
+            'schemaType' => 'CollectionPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Categories'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'CollectionPage',
+                'name' => 'Finance Categories',
+                'description' => 'Browse every finance category with featured guides and deep-dive learning paths.',
+                'url' => base_url('/categories'),
+                'hasPart' => array_map(static function (array $category): array {
+                    return [
+                        '@type' => 'CollectionPage',
+                        'name' => $category['name'],
+                        'url' => base_url('/blog?category=' . $category['slug']),
+                        'image' => $category['featured_image'] ?? null,
+                    ];
+                }, $categories),
+                'isPartOf' => [
+                    '@type' => 'WebSite',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'url' => base_url('/'),
+                ],
+            ],
+        ]);
     }
 
     public function article(array $matches): void
@@ -136,7 +254,15 @@ final class PublicController
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
             http_response_code(404);
-            view('errors/404');
+            view('errors/404', [
+                'seoTitle' => 'Article not found',
+                'seoDescription' => 'This finance guide is unavailable. Explore other finance articles and tools.',
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => base_url('/')],
+                    ['name' => 'Guides', 'url' => base_url('/blog')],
+                    ['name' => 'Not Found'],
+                ],
+            ]);
             return;
         }
         $article['slug'] = $article['slug'] ?? $slug;
@@ -151,15 +277,56 @@ final class PublicController
         $stmt = $pdo->prepare('SELECT slug, title FROM articles WHERE status = "published" AND id > :id ORDER BY id ASC LIMIT 1');
         $stmt->execute([':id' => $article['id']]);
         $next = $stmt->fetch(PDO::FETCH_ASSOC);
+        $seoDescription = $article['seo_description'] ?: excerpt($article['content_html'] ?? '');
         view('article', [
             'article' => $article,
             'comments' => $comments,
             'csrf' => Security::csrfToken(),
             'seoTitle' => $article['seo_title'] ?: $article['title'],
-            'seoDescription' => $article['seo_description'] ?? '',
+            'seoDescription' => $seoDescription,
             'prev' => $prev,
             'next' => $next,
             'ampUrl' => base_url('/blog/' . $slug . '/amp'),
+            'seoImage' => !empty($article['featured_image']) ? $article['featured_image'] : null,
+            'seoType' => 'article',
+            'seoPublished' => date('c', (int) $article['created_at']),
+            'seoModified' => date('c', (int) $article['created_at']),
+            'seoSection' => $article['category_name'] ?? null,
+            'schemaType' => 'Article',
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'Article',
+                'headline' => $article['title'],
+                'description' => $seoDescription,
+                'image' => $article['featured_image'] ? [$article['featured_image']] : null,
+                'datePublished' => date('c', (int) $article['created_at']),
+                'dateModified' => date('c', (int) $article['created_at']),
+                'author' => [
+                    '@type' => 'Organization',
+                    'name' => 'Finance Editorial Team',
+                ],
+                'publisher' => [
+                    '@type' => 'Organization',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'logo' => [
+                        '@type' => 'ImageObject',
+                        'url' => $article['featured_image'] ?? Config::get('seo_image', ''),
+                    ],
+                ],
+                'mainEntityOfPage' => base_url('/blog/' . $slug),
+                'articleSection' => $article['category_name'] ?? null,
+                'isPartOf' => [
+                    '@type' => 'WebSite',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'url' => base_url('/'),
+                ],
+            ],
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Guides', 'url' => base_url('/blog')],
+                ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog?category=' . ($article['category_slug'] ?? ''))],
+                ['name' => $article['title']],
+            ],
         ]);
     }
 
@@ -168,52 +335,186 @@ final class PublicController
         $this->ensureInstalled();
         $slug = trim($matches[1] ?? '', '/');
         $pdo = Database::connection();
-        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
+        $stmt = $pdo->prepare("SELECT a.id, a.title, a.content_html, a.seo_description, a.featured_image, a.created_at, c.name as category_name, c.slug as category_slug FROM articles a LEFT JOIN categories c ON a.category_id = c.id WHERE a.slug = :slug AND a.status = 'published' LIMIT 1");
         $stmt->execute([':slug' => $slug]);
         $article = $stmt->fetch(PDO::FETCH_ASSOC);
         if (!$article) {
             http_response_code(404);
-            view('errors/404');
+            view('errors/404', [
+                'seoTitle' => 'Article not found',
+                'seoDescription' => 'This finance guide is unavailable. Explore other finance articles and tools.',
+                'breadcrumbs' => [
+                    ['name' => 'Home', 'url' => base_url('/')],
+                    ['name' => 'Guides', 'url' => base_url('/blog')],
+                    ['name' => 'Not Found'],
+                ],
+            ]);
             return;
         }
         $article['content_html'] = Security::sanitizeHtml($article['content_html'] ?? '');
         $article['slug'] = $slug;
-        view('article-amp', ['article' => $article]);
+        $seoDescription = $article['seo_description'] ?: excerpt($article['content_html'] ?? '');
+        view('article-amp', [
+            'article' => $article,
+            'seoTitle' => $article['title'],
+            'seoDescription' => $seoDescription,
+            'seoImage' => !empty($article['featured_image']) ? $article['featured_image'] : null,
+            'seoType' => 'article',
+            'seoPublished' => date('c', (int) $article['created_at']),
+            'seoModified' => date('c', (int) $article['created_at']),
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Guides', 'url' => base_url('/blog')],
+                ['name' => $article['category_name'] ?? 'Category', 'url' => base_url('/blog?category=' . ($article['category_slug'] ?? ''))],
+                ['name' => $article['title']],
+            ],
+        ]);
     }
 
     public function tools(): void
     {
         $this->ensureInstalled();
         Analytics::track('/tools');
-        view('tools/index');
+        view('tools/index', [
+            'seoTitle' => config('seo_tools', 'Finance Tools'),
+            'seoDescription' => 'Interactive finance calculators with transparent formulas and clear explanations.',
+            'seoImage' => config('seo_image') ?: null,
+            'schemaType' => 'CollectionPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Tools'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'CollectionPage',
+                'name' => config('seo_tools', 'Finance Tools'),
+                'description' => 'Interactive finance calculators with transparent formulas and clear explanations.',
+                'url' => base_url('/tools'),
+                'hasPart' => [
+                    [
+                        '@type' => 'WebPage',
+                        'name' => 'Compound Interest Calculator',
+                        'url' => base_url('/tools/compound-interest'),
+                    ],
+                    [
+                        '@type' => 'WebPage',
+                        'name' => 'Loan Payment Calculator',
+                        'url' => base_url('/tools/loan-calculator'),
+                    ],
+                    [
+                        '@type' => 'WebPage',
+                        'name' => 'FIRE Calculator',
+                        'url' => base_url('/tools/fire-calculator'),
+                    ],
+                    [
+                        '@type' => 'WebPage',
+                        'name' => 'Real Inflation Calculator',
+                        'url' => base_url('/tools/inflation-calculator'),
+                    ],
+                ],
+                'isPartOf' => [
+                    '@type' => 'WebSite',
+                    'name' => Config::get('APP_NAME', 'Finance'),
+                    'url' => base_url('/'),
+                ],
+            ],
+        ]);
     }
 
     public function compoundInterest(): void
     {
         $this->ensureInstalled();
         Analytics::track('/tools/compound-interest');
-        view('tools/compound-interest');
+        view('tools/compound-interest', [
+            'seoTitle' => 'Compound Interest Calculator',
+            'seoDescription' => 'Calculate compound growth with transparent assumptions and step-by-step inputs.',
+            'seoImage' => config('seo_image') ?: null,
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Tools', 'url' => base_url('/tools')],
+                ['name' => 'Compound Interest'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Compound Interest Calculator',
+                'description' => 'Calculate compound growth with transparent assumptions and step-by-step inputs.',
+                'url' => base_url('/tools/compound-interest'),
+            ],
+        ]);
     }
 
     public function loanCalculator(): void
     {
         $this->ensureInstalled();
         Analytics::track('/tools/loan-calculator');
-        view('tools/loan-calculator');
+        view('tools/loan-calculator', [
+            'seoTitle' => 'Loan Payment Calculator',
+            'seoDescription' => 'Estimate monthly loan payments with clear step-by-step inputs and explanations.',
+            'seoImage' => config('seo_image') ?: null,
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Tools', 'url' => base_url('/tools')],
+                ['name' => 'Loan Calculator'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Loan Payment Calculator',
+                'description' => 'Estimate monthly loan payments with clear step-by-step inputs and explanations.',
+                'url' => base_url('/tools/loan-calculator'),
+            ],
+        ]);
     }
 
     public function fireCalculator(): void
     {
         $this->ensureInstalled();
         Analytics::track('/tools/fire-calculator');
-        view('tools/fire-calculator');
+        view('tools/fire-calculator', [
+            'seoTitle' => 'FIRE Number Calculator',
+            'seoDescription' => 'Calculate your financial independence number with guided assumptions.',
+            'seoImage' => config('seo_image') ?: null,
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Tools', 'url' => base_url('/tools')],
+                ['name' => 'FIRE Calculator'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'FIRE Number Calculator',
+                'description' => 'Calculate your financial independence number with guided assumptions.',
+                'url' => base_url('/tools/fire-calculator'),
+            ],
+        ]);
     }
 
     public function inflationCalculator(): void
     {
         $this->ensureInstalled();
         Analytics::track('/tools/inflation-calculator');
-        view('tools/inflation-calculator');
+        view('tools/inflation-calculator', [
+            'seoTitle' => 'Real Inflation Calculator',
+            'seoDescription' => 'Understand inflation-adjusted value changes with step-by-step inputs.',
+            'seoImage' => config('seo_image') ?: null,
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Tools', 'url' => base_url('/tools')],
+                ['name' => 'Inflation Calculator'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Real Inflation Calculator',
+                'description' => 'Understand inflation-adjusted value changes with step-by-step inputs.',
+                'url' => base_url('/tools/inflation-calculator'),
+            ],
+        ]);
     }
 
     public function search(): void
@@ -250,7 +551,23 @@ final class PublicController
     {
         $this->ensureInstalled();
         Analytics::track('/contact');
-        view('contact', ['csrf' => Security::csrfToken()]);
+        view('contact', [
+            'csrf' => Security::csrfToken(),
+            'seoTitle' => 'Contact Finance Editorial Team',
+            'seoDescription' => 'Reach our finance editorial team for questions, partnerships, or support.',
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Contact'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'ContactPage',
+                'name' => 'Contact Finance Editorial Team',
+                'description' => 'Reach our finance editorial team for questions, partnerships, or support.',
+                'url' => base_url('/contact'),
+            ],
+        ]);
     }
 
     public function submitContact(): void
@@ -276,14 +593,44 @@ final class PublicController
     {
         $this->ensureInstalled();
         Analytics::track('/privacy');
-        view('privacy');
+        view('privacy', [
+            'seoTitle' => 'Privacy Policy',
+            'seoDescription' => 'Read how we protect your data and keep analytics privacy-first.',
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Privacy'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Privacy Policy',
+                'description' => 'Read how we protect your data and keep analytics privacy-first.',
+                'url' => base_url('/privacy'),
+            ],
+        ]);
     }
 
     public function terms(): void
     {
         $this->ensureInstalled();
         Analytics::track('/terms');
-        view('terms');
+        view('terms', [
+            'seoTitle' => 'Terms of Service',
+            'seoDescription' => 'Review terms, conditions, and usage guidelines for the finance platform.',
+            'schemaType' => 'WebPage',
+            'breadcrumbs' => [
+                ['name' => 'Home', 'url' => base_url('/')],
+                ['name' => 'Terms'],
+            ],
+            'schemaData' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'WebPage',
+                'name' => 'Terms of Service',
+                'description' => 'Review terms, conditions, and usage guidelines for the finance platform.',
+                'url' => base_url('/terms'),
+            ],
+        ]);
     }
 
     public function unsubscribe(): void

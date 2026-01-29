@@ -8,6 +8,7 @@
     <label>Site URL <input type="text" name="site_url" value="<?= e($settings['site_url'] ?? '') ?>"></label>
     <label>SEO title (default) <input type="text" name="seo_title" value="<?= e($settings['seo_title'] ?? '') ?>"></label>
     <label>SEO description (default) <input type="text" name="seo_description" value="<?= e($settings['seo_description'] ?? '') ?>"></label>
+    <label>SEO image (default) <input type="text" name="seo_image" value="<?= e($settings['seo_image'] ?? '') ?>"></label>
     <label>SEO title (home) <input type="text" name="seo_home" value="<?= e($settings['seo_home'] ?? '') ?>"></label>
     <label>SEO title (tools) <input type="text" name="seo_tools" value="<?= e($settings['seo_tools'] ?? '') ?>"></label>
     <label>GA4 Tracking ID <input type="text" name="ga4_id" value="<?= e($settings['ga4_id'] ?? '') ?>"></label>

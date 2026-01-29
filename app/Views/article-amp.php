@@ -1,12 +1,68 @@
-<?php header('Content-Type: text/html'); ?>
+<?php
+header('Content-Type: text/html');
+$seoTitle = $seoTitle ?? $article['title'];
+$seoDescription = $seoDescription ?? '';
+$seoImage = $seoImage ?? ($article['featured_image'] ?? config('seo_image'));
+?>
 <!doctype html>
 <html amp lang="en">
 <head>
     <meta charset="utf-8">
-    <title><?= e($article['title']) ?></title>
+    <title><?= e($seoTitle) ?></title>
+    <meta name="description" content="<?= e($seoDescription ?: excerpt($article['content_html'] ?? '')) ?>">
     <link rel="canonical" href="<?= base_url('/blog/' . $article['slug']) ?>">
+    <meta property="og:title" content="<?= e($seoTitle) ?>">
+    <meta property="og:description" content="<?= e($seoDescription ?: excerpt($article['content_html'] ?? '')) ?>">
+    <meta property="og:type" content="article">
+    <meta property="og:url" content="<?= base_url('/blog/' . $article['slug']) ?>">
+    <?php if (!empty($seoImage)): ?>
+        <meta property="og:image" content="<?= e($seoImage) ?>">
+        <meta name="twitter:image" content="<?= e($seoImage) ?>">
+    <?php endif; ?>
+    <meta name="twitter:card" content="<?= !empty($seoImage) ? 'summary_large_image' : 'summary' ?>">
+    <meta name="twitter:title" content="<?= e($seoTitle) ?>">
+    <meta name="twitter:description" content="<?= e($seoDescription ?: excerpt($article['content_html'] ?? '')) ?>">
     <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
     <script async src="https://cdn.ampproject.org/v0.js"></script>
+    <script type="application/ld+json">
+        <?= json_encode([
+            '@context' => 'https://schema.org',
+            '@type' => 'Article',
+            'headline' => $article['title'],
+            'description' => $seoDescription ?? '',
+            'image' => !empty($article['featured_image']) ? [$article['featured_image']] : null,
+            'datePublished' => date('c', (int) $article['created_at']),
+            'dateModified' => date('c', (int) $article['created_at']),
+            'author' => ['@type' => 'Organization', 'name' => 'Finance Editorial Team'],
+            'publisher' => [
+                '@type' => 'Organization',
+                'name' => config('APP_NAME', 'Finance'),
+                'logo' => [
+                    '@type' => 'ImageObject',
+                    'url' => $article['featured_image'] ?? config('seo_image', ''),
+                ],
+            ],
+            'mainEntityOfPage' => base_url('/blog/' . $article['slug']),
+        ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+    </script>
+    <?php if (!empty($breadcrumbs)): ?>
+        <script type="application/ld+json">
+            <?= json_encode([
+                '@context' => 'https://schema.org',
+                '@type' => 'BreadcrumbList',
+                'itemListElement' => array_map(
+                    fn ($crumb, $index) => [
+                        '@type' => 'ListItem',
+                        'position' => $index + 1,
+                        'name' => $crumb['name'],
+                        'item' => $crumb['url'] ?? base_url('/blog/' . $article['slug']),
+                    ],
+                    $breadcrumbs,
+                    array_keys($breadcrumbs)
+                ),
+            ], JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) ?>
+        </script>
+    <?php endif; ?>
     <style amp-custom>
         :root{color-scheme:dark;}
         body{margin:0;font-family:'Segoe UI',sans-serif;background:#0b0b12;color:#f5f5f5;}

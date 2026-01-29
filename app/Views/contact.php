@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Contact Finance Editorial Team';
+$seoDescription = $seoDescription ?? 'Reach our finance editorial team for questions, partnerships, or support.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Contact us</h1>

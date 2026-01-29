@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Real Inflation Calculator';
+$seoDescription = $seoDescription ?? 'Understand inflation-adjusted value changes with step-by-step inputs.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Real inflation calculator</h1>

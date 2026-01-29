@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Start Here: Your Finance Roadmap';
+$seoDescription = $seoDescription ?? 'Beginner to advanced finance paths with curated categories and step-by-step guides.';
+$seoImage = $seoImage ?? (config('seo_image') ?: ($categories[0]['featured_image'] ?? ''));
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Start here: build your financial journey.</h1>

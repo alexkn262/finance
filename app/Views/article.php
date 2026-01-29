@@ -1,4 +1,8 @@
 <?php ob_start(); ?>
+<?php
+$seoImage = $seoImage ?? ($article['featured_image'] ?? '');
+$seoDescription = $seoDescription ?? ($article['seo_description'] ?? '');
+?>
 <section class="hero compact">
     <div class="container">
         <h1><?= e($article['title']) ?></h1>

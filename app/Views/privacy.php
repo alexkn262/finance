@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Privacy Policy';
+$seoDescription = $seoDescription ?? 'Read how we protect your data and keep analytics privacy-first.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Privacy policy</h1>

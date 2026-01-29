@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'FIRE Number Calculator';
+$seoDescription = $seoDescription ?? 'Calculate your financial independence number with guided assumptions.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>FIRE calculator</h1>

@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Loan Payment Calculator';
+$seoDescription = $seoDescription ?? 'Estimate monthly loan payments with clear step-by-step inputs and explanations.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Loan payment calculator</h1>

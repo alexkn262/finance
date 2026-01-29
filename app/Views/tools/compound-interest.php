@@ -1,4 +1,9 @@
 <?php ob_start(); ?>
+<?php
+$seoTitle = $seoTitle ?? 'Compound Interest Calculator';
+$seoDescription = $seoDescription ?? 'Calculate compound growth with transparent assumptions and step-by-step inputs.';
+$seoImage = $seoImage ?? config('seo_image');
+?>
 <section class="hero compact">
     <div class="container">
         <h1>Compound interest calculator</h1>
